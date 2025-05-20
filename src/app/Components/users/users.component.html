@@ -1,0 +1,165 @@
+<!-- <div class="container-fluid">
+    <div class="row p-2 bg-info">
+        <div class="col-6">
+            <h3>Users</h3>
+        </div>
+        <div class="col-6 text-end">
+            <button class="btn btn-warning" (click)="openModal()">Add Users</button>
+        </div>
+    </div>
+    <table class="table table-bordered table-stripped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (item of userList; track $index) {
+            <tr>
+                <td>{{item.userName}}</td>
+                <td>{{item.email}}</td>
+                <td>{{item.roleName}}</td>
+                <td>{{item.status? 'Active' : 'Inactive'}}</td>
+                <td class="text-center">
+                    <button class="btn btn-danger" (click)="onDelete(item.id)">Delete</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+
+</div> -->
+
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="text-primary">User Management</h3>
+        <button class="btn btn-success" (click)="openModal()">
+            <i class="bi bi-plus-circle me-1"></i> Add User
+        </button>
+    </div>
+
+    <div class="table-responsive shadow-sm border rounded">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of userList; track $index) {
+                <tr>
+                    <td>{{ item.userName }}</td>
+                    <td>{{ item.email }}</td>
+                    <td>{{ item.roleName }}</td>
+                    <td>
+                        <span class="badge" [ngClass]="item.status ? 'bg-success' : 'bg-secondary'">
+                            {{ item.status ? 'Active' : 'Inactive' }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-outline-success btn-sm" (click)="onEdit(item)">
+                            <i class="bi bi-trash"></i> Edit
+                        </button>
+                    <!-- </td>
+
+                    <td class="text-center"> -->
+                        ||
+                        <button class="btn btn-outline-danger btn-sm" (click)="onDelete(item.id)">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal" id="myModal" #myModal>
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <!-- Modal Header -->
+        <!-- <div class="modal-header bg-info">
+          <h4 class="modal-title">Add User</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="closeModal()"></button>
+        </div> -->
+        <div class="modal-header" style="background-color: #FF5733;">
+            @if(userForm.value.id != 0)
+            {
+                <h5 class="modal-title">Update User</h5>
+            }
+            @else{
+                <h5 class="modal-title">Add User</h5>
+            }
+            <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="closeModal()"></button>
+          </div>
+  
+        <form [formGroup]="userForm" (ngSubmit) ="onSubmit()">
+        <!-- Modal body -->
+        <div class="modal-body">
+         <div class="row">
+            <div class="col-12">
+                <input type="text" formControlName="userName" name="userName" class="form-control" placeholder="UserName">
+            </div>
+         </div>
+         <div class="row mt-3">
+            <div class="col-6">
+                <input type="email" formControlName="email" name="email" class="form-control" placeholder="Email">
+                <div *ngIf="emailControl?.errors?.['required']" class="text-danger mt-1"
+                style="font-size: 11px; margin-left: 10px;">*Email is required.</div>
+                <div *ngIf="emailControl?.errors?.['email']"class="text-danger mt-1"
+                style="font-size: 11px; margin-left: 10px;">Email format is invalid.</div>
+                <div *ngIf="emailControl?.errors?.['pattern']" class="text-danger mt-1"
+                style="font-size: 11px; margin-left: 10px;">Email must include a valid domain (like .com, .org).</div>
+                <div *ngIf="emailControl?.errors?.['emailExists']" class="text-danger mt-1"
+                    style="font-size: 11px; margin-left: 10px;">This email is already registered.
+                </div>
+            </div>
+            <div class="col-6">
+                <input type="password" formControlName="password" name="password" class="form-control" placeholder="Password">
+            </div>
+         </div>
+         <div class="row mt-3">
+            <div class="col-6">
+                <!-- <input type="text" formControlName="roleid" name="roleid" class="form-control" placeholder="Role"> -->
+                <label for="roleid" class="form-label">Role</label>
+                <!-- <select formControlName="roleid" name="roleid" class="form-control" id="roleid">
+                  <option value="" disabled selected>Select Role</option>
+                  <option value="1">Admin</option>
+                  <option value="2">User</option>
+                </select> -->
+                <select formControlName="roleid" class="form-control" id="roleid">
+                    <option [ngValue]="null" disabled>Select Role</option>
+                    <option [ngValue]="1">Admin</option>
+                    <option [ngValue]="2">User</option>
+                  </select>
+            </div>
+         </div>
+        </div>
+  
+        <!-- Modal footer -->
+        <div class="modal-footer">
+            @if(userForm.value.id == 0){
+                <button type="submit" [disabled]="this.userForm.invalid" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+        }
+        @else{
+            <button type="submit" [disabled]="this.userForm.invalid" class="btn btn-success" data-bs-dismiss="modal">Update</button>
+        }
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="closeModal()">Close</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
