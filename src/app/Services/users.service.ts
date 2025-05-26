@@ -7,7 +7,6 @@ import { Users } from '../Models/users';
 })
 export class UsersService {
 
-  //private apiUrl = 'https://localhost:7192/api/Registration/register'
   private viewUserApiUrl = 'https://localhost:7192/api/Users/viewusers'
 
   private addUserApiUrl = 'https://localhost:7192/api/Users/register'
@@ -16,6 +15,8 @@ export class UsersService {
 
   private updateUserApiUrl = 'https://localhost:7192/api/Users/updateuser';
 
+  private checkUserNameExists ='https://localhost:7192/api/Users/check-username?username=';
+
   constructor() { }
 
   http = inject(HttpClient)
@@ -23,6 +24,10 @@ export class UsersService {
   getAllUsers()
   {
     return this.http.get<Users[]>(this.viewUserApiUrl);
+  }
+
+  checkUsernameExists(username: string) {
+    return this.http.get<boolean>(`${this.checkUserNameExists}${username}`);
   }
 
   addUser(data : any)

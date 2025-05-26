@@ -1,0 +1,66 @@
+<!-- <div class="d-flex" id="wrapper"> -->
+  <!-- Sidebar -->
+  <div class="text-white p-3" id="sidebar">
+    <h4>Admin Panel</h4>
+    <ul class="nav flex-column">
+      <li class="nav-item"><a class="nav-link text-white" routerLink="/adminDashboard">Dashboard</a></li>
+      <li class="nav-item"><a class="nav-link text-white" routerLink="/adminTask">Tasks</a></li>
+      <li class="nav-item"><a class="nav-link text-white" routerLink="/users" routerLinkActive="active">Users</a></li>
+      <li class="nav-item"><a class="nav-link text-white" routerLink="/settings">Settings</a></li>
+    </ul>
+  </div>
+
+  <!-- Page Content -->
+  <div id="page-content-wrapper" class="w-100">
+    <!-- Top navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom px-4">
+      <h5 class="mb-0">Dashboard</h5>
+      <div class="ms-auto">Welcome, Admin</div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid p-4">
+      <!-- Stat Cards -->
+      <div class="row mb-4">
+        <div class="col-md-3" *ngFor="let stat of stats">
+          <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+              <h5 class="card-title">{{ stat.title }}</h5>
+              <p class="card-text fs-4">{{ stat.count }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tasks Table -->
+      <div class="card">
+        <div class="card-header bg-secondary text-white">
+          Task Overview
+        </div>
+        <div class="card-body">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Task</th>
+                <th>Status</th>
+                <th>Assigned To</th>
+                <th>Due Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let task of taskList; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ task.title }}</td>
+                <td><span class="badge bg-info">{{ task.status }}</span></td>
+                <td>{{ task.assignedTo }}</td>
+                <td>{{ task.dueDate | date }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- </div> -->
+<router-outlet></router-outlet>
