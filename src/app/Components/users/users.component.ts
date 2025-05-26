@@ -1,18 +1,33 @@
 import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Users } from '../../Models/users';
 import { UsersService } from '../../Services/users.service';
 import { CommonModule } from '@angular/common';
+import { debounceTime, first, map, switchMap } from 'rxjs';
+import { RouterLink, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterOutlet, RouterLink],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css'
 })
 export class UsersComponent implements OnInit {
 @ViewChild('myModal') model : ElementRef | undefined;
+
+
+UsernameExistsValidator(): AsyncValidatorFn {
+  return (control: AbstractControl) => {
+    return control.valueChanges.pipe(
+      debounceTime(300),
+      switchMap(username => this.userService.checkUsernameExists(username)),
+      map(exists => (exists ? { usernameTaken: true } : null)),
+      first()
+    );
+  };
+}
+
 
 userList: Users[] = [];
 userService = inject(UsersService);
@@ -53,21 +68,33 @@ getUser()
   })
 }
 
+get userNameControl()
+{
+  return this.userForm.get('userName');
+}
+
  get emailControl() {
   return this.userForm.get('email');  // Access the email control
 }
+
+  get phoneNumberControl(){
+    return this.userForm.get('phoneNumber');
+  }
 
   setFormState()
   {
     this.userForm = this.fb.group({
       id: 0,
-      userName: ['',[Validators.required]],
+      name: ['',[Validators.required]],
+      userName: ['',[Validators.required,], [this.UsernameExistsValidator()]],
       email: ['',[Validators.required, Validators.email,
         // Validators.pattern('^[a-zA-Z0-9._%+-]+@example\\.com$')
         Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$') 
         ]],
       password: ['',[Validators.required]],
-      roleid: ['',[Validators.required]]
+      roleid: ['',[Validators.required]],
+      phoneNumber: ['',[Validators.required, Validators.maxLength(10), Validators.minLength(10),Validators.pattern(/^[0-9]{10}$/)]],
+      gender: ['',Validators.required]
     });
   }
 
@@ -80,12 +107,6 @@ getUser()
       return;
     }
     this.formValue = this.userForm.value;
-    // this.userService.addUser(this.formValue).subscribe((res) => {
-    //   alert('User Added Successfully....');
-    //   this.getUser();
-    //   this.userForm.reset();
-    //   this.closeModal();
-    // })
 
     if(this.userForm.value.id == 0)
     {

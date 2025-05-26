@@ -1,0 +1,189 @@
+
+
+  <!-- Sidebar -->
+<div class="text-white p-3" id="sidebar">
+    <h4>Admin Panel</h4>
+    <ul class="nav flex-column">
+      <li class="nav-item"><a class="nav-link text-white" routerLink="/adminDashboard">Dashboard</a></li>
+      <li class="nav-item"><a class="nav-link text-white" routerLink="/users">Users</a></li>
+      <li class="nav-item"><a class="nav-link text-white" routerLink="/settings">Settings</a></li>
+    </ul>
+  </div>
+
+<div class="d-flex justify-content-end align-items-center gap-2 mb-3" id="main-content">
+    <button class="btn btn-outline-primary" (click)="openModal()">
+      <i class="bi bi-plus-circle me-1" ></i> Create Task
+    </button>
+    <button class="btn btn-outline-secondary" (click)="openModal1()">
+      <i class="bi bi-upload me-1"></i> Upload Task
+    </button>
+  </div>
+  
+  <!-- Main Content -->
+  <div id="main-content">
+    <div class="card">
+      <div class="card-header bg-secondary text-white">
+        Task Overview
+      </div>
+      <div class="card-body">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Task</th>
+              <th>Status</th>
+              <th>Assigned To</th>
+              <th>Due Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let task of taskList; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ task.title }}</td>
+              <td><span class="badge bg-info">{{ task.status }}</span></td>
+              <td>{{ task.assignedTo }}</td>
+              <td>{{ task.dueDate | date }}</td>
+              <td class="text-center">
+                <button class="btn btn-outline-success btn-sm" >
+                  <i class="bi bi-pencil"></i> Edit
+                </button>
+                ||
+                <button class="btn btn-outline-danger btn-sm" >
+                  <i class="bi bi-trash"></i> Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Task -->
+  <div class="modal" id="myModal" #myModal>
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Create Task</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="closeModal()"></button>
+        </div>
+  
+
+        <form [formGroup]="taskForm" (ngSubmit) ="onSubmit()">
+        <!-- Modal body -->
+        <div class="modal-body">
+          
+            <div>
+                <div class="row">
+                    <div class="col-12">
+                        <input type="text" formControlName="taskName"  name="taskName" class="form-control" placeholder="Task Name">
+                    </div>
+                </div>
+             </div>  
+             <!-- <div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <input type="text"  name="name" class="form-control" placeholder="Assigned To">
+                    </div>
+                </div>
+             </div>   -->
+             <div class="row mt-3">
+                <div class="col-12">
+                  <select class="form-control" formControlName="userId" [(ngModel)]="selectedUserId" name="userId">
+                    <option value="">Assign To</option>
+                    <option *ngFor="let user of users" [value]="user.id">{{ user.name }}</option>
+                  </select>
+                </div>
+             </div>
+             <div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <input type="date" formControlName="dueDate"  name="dueDate" class="form-control" placeholder="Due Date">
+                        <div *ngIf="dueDateControl?.hasError('pastDate') && dueDateControl?.touched" class="text-danger">
+                          Due date cannot be in the past.
+                        </div>
+                      
+                        <div *ngIf="dueDateControl?.hasError('required') && dueDateControl?.touched" class="text-danger">
+                          Due date is required.
+                        </div>
+                    </div>
+                </div>
+             </div> 
+             <div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <!-- <input type="text"  name="name" class="form-control" placeholder="Description"> -->
+                        <label for="description" class="form-label">Description</label>
+                        <textarea 
+                          name="description" 
+                          formControlName="description"
+                          id="description" 
+                          class="form-control" 
+                          rows="4" 
+                          placeholder="Enter task description">
+                        </textarea>
+                    </div>
+                </div>
+             </div> 
+        </div>
+  
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="submit" [disabled]="this.taskForm.invalid" class="btn btn-primary" data-bs-dismiss="modal" >Save</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="closeModal()">Close</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+
+  <div class="modal" id="myModal1" #myModal1>
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Upload Task</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="closeModal()"></button>
+        </div>
+        <form [formGroup]="fileUploadForm" (ngSubmit)="onFileUpload()">
+          <div class="modal-body">
+        
+            <!-- Upload File -->
+            <div class="row">
+              <div class="col-12">
+                <label for="fileInput" class="form-label">Upload File</label>
+                <input
+                  type="file"
+                  id="fileInput"
+                  class="form-control"
+                  (change)="onFileSelected($event)"
+                  accept="*/*" />
+        
+                <div *ngIf="fileUploadError" class="text-danger mt-1">
+                  {{ fileUploadError }}
+                </div>
+              </div>
+            </div>
+        
+          </div>
+        
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" [disabled]="!selectedFile">Upload</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Cancel</button>
+          </div>
+        </form>
+
+        
+      </div>
+    </div>
+  </div>
+
+
+
+  <router-outlet></router-outlet>
+
+  

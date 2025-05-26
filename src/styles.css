@@ -1,1 +1,28 @@
-/* You can add global styles to this file, and also import other style files */
+#sidebar {
+    width: 240px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #3B4252;
+    color: white;
+    padding: 1rem;
+  }
+  
+  #page-content-wrapper { 
+    padding-right: 240px;
+    width: calc(100% - 240px);
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: #f8f9fa; 
+  }
+
+  li{
+    color: white;
+    cursor: pointer;  
+   }
+ 
+   li:hover{
+     background-color: rgb(200, 158, 145);
+   }

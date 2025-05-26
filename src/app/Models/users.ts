@@ -4,5 +4,8 @@ export interface Users {
     email:string,
     roleid:number,
     roleName:string,
-    status:boolean
+    status:boolean,
+    name:string,
+    phoneNumber:string,
+    gender:string
 }
