@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import { UserAuthService } from '../../Services/user-auth.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -23,7 +24,32 @@ export class AdminDashboardComponent implements OnInit {
     { title: 'Bug Fixes', status: 'Pending', assignedTo: 'Mike', dueDate: new Date() }
   ];
 
-  constructor() {}
+  
+  user?:any
+  constructor(private authService: UserAuthService) {
+    this.authService.getCurrentAuthUser().subscribe((r)=>{
+      console.log(r);
+      this.user=r;
 
-  ngOnInit(): void {}
+    });
+
+  }
+
+  ngOnInit() {
+    // const tokens = sessionStorage.getItem('JWT_TOKEN');
+    // if (tokens) {
+    //   const parsedTokens = JSON.parse(tokens);
+    //   const accessToken = parsedTokens.accessToken;
+    //   const refreshToken = parsedTokens.refreshToken;
+  
+    //   if (accessToken && refreshToken) {
+    //     this.authService.startRefreshTokenTimer(accessToken, refreshToken);
+    //   }
+    // }
+  }
+  
+
+  logout(){
+    this.authService.logout();
+  }
 }
