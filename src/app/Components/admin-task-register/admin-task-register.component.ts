@@ -3,6 +3,7 @@ import { Component, ElementRef, NgModule, ViewChild, inject, viewChild } from '@
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { TasksService } from '../../Services/tasks.service';
 import { FormGroup, FormsModule,FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Tasks } from '../../Models/tasks';
 
 interface User {
   id: number;
@@ -23,6 +24,7 @@ export class AdminTaskRegisterComponent {
   @ViewChild('myModal1') model1 : ElementRef | undefined;
   
   users: User[] = [];
+  tasks: Tasks[] = [];
   selectedUserId: number | null = null;
   taskService = inject(TasksService);
 
@@ -56,6 +58,7 @@ export class AdminTaskRegisterComponent {
   ngOnInit(): void {
     this.setFormState();
     this.getUsers();
+    this.getTasks();
   }
 
   openModal(){
@@ -76,6 +79,7 @@ export class AdminTaskRegisterComponent {
 
   closeModal()
   {
+    this.setFormState();
     if(this.model != null)
     {
       this.model.nativeElement.style.display = 'none';
@@ -95,6 +99,37 @@ export class AdminTaskRegisterComponent {
     })
   }
 
+  getTasks() {
+  this.taskService.getAllTasks().subscribe((res) => {
+    this.tasks = res;
+  })
+}
+
+onDelete(id : number)
+  {
+    const isconfirm = confirm("Are you sure you want to delete this Task?");
+    if(isconfirm)
+    {
+      this.taskService.deleteTask(id).subscribe((res) => {
+        alert("Task deleted successfully....");
+        this.getTasks();
+      });
+    }
+  }
+
+  toDateInputFormat(date: any): string {
+    return new Date(date).toISOString().split('T')[0];
+  }
+  
+
+  onEdit(Task:Tasks)
+  {
+   // debugger
+    this.openModal();
+    this.taskForm.patchValue({ ...Task,
+      dueDate: this.toDateInputFormat(Task.dueDate)});
+  }
+
   get dueDateControl()
 {
   return this.taskForm.get('dueDate');
@@ -108,11 +143,11 @@ get fileuploadControl()
   setFormState()
   {
     this.taskForm = this.fb.group({
-      id: 0,
+      taskId: 0,
       taskName: ['',[Validators.required]],
       userId: ['',Validators.required],
       dueDate: ['',[Validators.required, this.noPastDateValidator]],
-      description:['',Validators.required]      
+      taskDescription:['',Validators.required]      
     });
 
     this.fileUploadForm = this.fb.group({
@@ -122,6 +157,7 @@ get fileuploadControl()
 
   formValue: any;
   onSubmit(){
+    debugger
     console.log(this.taskForm.value);
     if(this.taskForm.invalid)
     {
@@ -130,8 +166,11 @@ get fileuploadControl()
     }
     this.formValue = this.taskForm.value;
     
-
-    
+    console.log(this.taskForm.value.taskid);
+    console.log(this.taskForm.value.id);
+    if(this.taskForm.value.taskId == 0){
+      debugger
+     
       this.taskService.addTask(this.formValue).subscribe({
         next: () => {
           alert('Task Added Successfully....');
@@ -139,6 +178,16 @@ get fileuploadControl()
           this.taskForm.reset();
           this.closeModal();
         }});
+      }
+     else{
+      this.taskService.updateTask(this.formValue).subscribe({
+        next: () => {
+          alert('Task Updated Successfully....');
+          //this.getUser();
+          this.taskForm.reset();
+          this.closeModal();
+        }});
+     } 
   }
 
   noPastDateValidator(control: AbstractControl): ValidationErrors | null {

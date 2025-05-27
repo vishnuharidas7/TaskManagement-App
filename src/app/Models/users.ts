@@ -2,7 +2,7 @@ export interface Users {
     id:number,
     userName:string,
     email:string,
-    roleid:number,
+    roleId:number,
     roleName:string,
     status:boolean,
     name:string,

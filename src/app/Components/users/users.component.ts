@@ -139,10 +139,15 @@ get userNameControl()
     }
   }
 
-  onEdit(Users:Users)
+  onEdit(user:Users)
   {
     this.openModal();
-    this.userForm.patchValue(Users);
+    this.userForm.patchValue(
+      //User
+      {
+        ...user,
+        roleid: Number(user.roleId)
+      });
   }
 
   onDelete(id : number)
