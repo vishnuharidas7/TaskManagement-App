@@ -34,21 +34,23 @@
               <th>Status</th>
               <th>Assigned To</th>
               <th>Due Date</th>
+              <th>Description</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let task of taskList; let i = index">
+            <tr *ngFor="let task of tasks; let i = index">
               <td>{{ i + 1 }}</td>
-              <td>{{ task.title }}</td>
-              <td><span class="badge bg-info">{{ task.status }}</span></td>
-              <td>{{ task.assignedTo }}</td>
+              <td>{{ task.taskName }}</td>
+              <td><span class="badge bg-info">{{ task.taskStatus }}</span></td>
+              <td>{{ task.userName }}</td>
               <td>{{ task.dueDate | date }}</td>
+              <td>{{ task.taskDescription }}</td>
               <td class="text-center">
-                <button class="btn btn-outline-success btn-sm" >
+                <button class="btn btn-outline-success btn-sm" (click)="onEdit(task)" >
                   <i class="bi bi-pencil"></i> Edit
                 </button>
                 ||
-                <button class="btn btn-outline-danger btn-sm" >
+                <button class="btn btn-outline-danger btn-sm" (click)="onDelete(task.taskId)" >
                   <i class="bi bi-trash"></i> Delete
                 </button>
               </td>
@@ -66,7 +68,14 @@
   
         <!-- Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">Create Task</h4>
+          @if(taskForm.value.taskId != 0)
+            {
+              <h4 class="modal-title">Edit Task</h4>
+            }
+            @else{
+              <h4 class="modal-title">Create Task</h4>
+            }
+          
           <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="closeModal()"></button>
         </div>
   
@@ -115,11 +124,11 @@
                 <div class="row mt-3">
                     <div class="col-12">
                         <!-- <input type="text"  name="name" class="form-control" placeholder="Description"> -->
-                        <label for="description" class="form-label">Description</label>
+                        <label for="taskDescription" class="form-label">Description</label>
                         <textarea 
-                          name="description" 
-                          formControlName="description"
-                          id="description" 
+                          name="taskDescription" 
+                          formControlName="taskDescription"
+                          id="taskDescription" 
                           class="form-control" 
                           rows="4" 
                           placeholder="Enter task description">
@@ -131,7 +140,12 @@
   
         <!-- Modal footer -->
         <div class="modal-footer">
+          @if(taskForm.value.taskId == 0){
           <button type="submit" [disabled]="this.taskForm.invalid" class="btn btn-primary" data-bs-dismiss="modal" >Save</button>
+          }
+          @else{
+            <button type="submit" [disabled]="this.taskForm.invalid" class="btn btn-primary" data-bs-dismiss="modal" >Update</button>
+          }
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="closeModal()">Close</button>
         </div>
         </form>
