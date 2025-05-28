@@ -4,6 +4,7 @@ import { AdminDashboardComponent } from './Components/admin-dashboard/admin-dash
 import { AdminTaskRegisterComponent } from './Components/admin-task-register/admin-task-register.component';
 import { AuthUsersComponent } from './Components/auth-users/auth-users.component';
 import { authGuard } from './Guard/auth.guard';
+import { UserDashboardComponent } from './Components/user-dashboard/user-dashboard.component';
 
 export const routes: Routes = [
 
@@ -20,6 +21,9 @@ export const routes: Routes = [
     },
     { 
         path: 'adminDashboard', component: AdminDashboardComponent
+    },
+    {
+        path: 'userDashboard', component: UserDashboardComponent
     },
     {
         path: 'adminTask', component: AdminTaskRegisterComponent

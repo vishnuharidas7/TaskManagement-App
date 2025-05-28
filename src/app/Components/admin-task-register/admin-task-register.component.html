@@ -33,6 +33,7 @@
               <th>Task</th>
               <th>Status</th>
               <th>Assigned To</th>
+              <th>Priority</th>
               <th>Due Date</th>
               <th>Description</th>
             </tr>
@@ -43,6 +44,7 @@
               <td>{{ task.taskName }}</td>
               <td><span class="badge bg-info">{{ task.taskStatus }}</span></td>
               <td>{{ task.userName }}</td>
+              <td>{{ task.priority }}</td>
               <td>{{ task.dueDate | date }}</td>
               <td>{{ task.taskDescription }}</td>
               <td class="text-center">
@@ -120,6 +122,18 @@
                     </div>
                 </div>
              </div> 
+             <div>
+              <div class="row mt-3">
+                <div class="col-12">
+                  <select formControlName="priority" class="form-control" id="priority" autocomplete="off">
+                      <option Value="" disabled>Priority</option>
+                      <option Value="Low">Low</option>
+                      <option Value="Medium">Medium</option>
+                      <option Value="High">High</option>
+                    </select>
+                  </div>
+              </div>
+             </div>
              <div>
                 <div class="row mt-3">
                     <div class="col-12">

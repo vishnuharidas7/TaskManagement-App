@@ -124,10 +124,10 @@ onDelete(id : number)
 
   onEdit(Task:Tasks)
   {
-   // debugger
     this.openModal();
     this.taskForm.patchValue({ ...Task,
       dueDate: this.toDateInputFormat(Task.dueDate)});
+      this.getTasks();
   }
 
   get dueDateControl()
@@ -147,7 +147,8 @@ get fileuploadControl()
       taskName: ['',[Validators.required]],
       userId: ['',Validators.required],
       dueDate: ['',[Validators.required, this.noPastDateValidator]],
-      taskDescription:['',Validators.required]      
+      taskDescription:['',Validators.required] ,
+      priority:['',Validators.required]     
     });
 
     this.fileUploadForm = this.fb.group({
@@ -177,6 +178,7 @@ get fileuploadControl()
           //this.getUser();
           this.taskForm.reset();
           this.closeModal();
+          this.getTasks();
         }});
       }
      else{
@@ -186,6 +188,7 @@ get fileuploadControl()
           //this.getUser();
           this.taskForm.reset();
           this.closeModal();
+          this.getTasks();
         }});
      } 
   }
@@ -225,10 +228,12 @@ onFileUpload() {
           alert('✅ File uploaded and data saved successfully!');
           this.fileUploadError = '';
           this.closeModal();
+          this.getTasks();
         } else {
           alert('❌ Upload failed: ' + response);
           this.fileUploadError = response;
           this.closeModal();
+          this.getTasks();
         }
       },
       error: (err) => {
