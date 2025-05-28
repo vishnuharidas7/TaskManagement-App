@@ -1,1 +1,180 @@
-<p>user-dashboard works!</p>
+<div class="container-fluid p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>User Dashboard</h2>
+      <div>
+        <button class="btn btn-primary me-2" (click)="openModal()"> Add Task</button>
+        <button class="btn btn-outline-secondary me-2" (click)="goToSettings()">Settings</button>
+        <button class="btn btn-outline-danger" (click)="logout()">Logout</button>
+      </div>
+      <!-- <button class="btn btn-primary" (click)="openAddTaskModal()">+ Add Task</button> -->
+    </div>
+  
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <div class="card text-white bg-info mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Assigned Tasks</h5>
+            <p class="card-text">{{ assignedTasksCount }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-white bg-warning mb-3">
+          <div class="card-body">
+            <h5 class="card-title">In Progress</h5>
+            <p class="card-text">{{ inProgressTasksCount }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Completed</h5>
+            <p class="card-text">{{ completedTasksCount }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <h4 class="mb-3">My Tasks</h4>
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Task</th>
+            <th>Status</th>
+            <th>Due Date</th>
+            <th>Priority</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let task of tasks; let i = index">
+            <td>{{i+1}}</td>
+            <td>{{ task.taskName }}</td>
+            <td>{{ task.taskStatus }}</td>
+            <td>{{ task.dueDate | date }}</td>
+            <td>{{task.priority}}</td>
+            <td>{{ task.taskDescription }}</td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary" (click)="onEdit(task)">Edit</button> ||    
+              <button class="btn btn-sm btn-outline-danger" (click)="onDelete(task.taskId)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal" id="myModal" #myModal>
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <!-- Modal Header -->
+        <div class="modal-header">
+          @if(taskForm.value.taskId != 0)
+            {
+              <h4 class="modal-title">Edit Task</h4>
+            }
+            @else{
+              <h4 class="modal-title">Create Task</h4>
+            }
+          
+          <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="closeModal()"></button>
+        </div>
+  
+
+        <form [formGroup]="taskForm" (ngSubmit) ="onSubmit()">
+        <!-- Modal body -->
+        <div class="modal-body">
+          
+            <div>
+                <div class="row">
+                    <div class="col-12">
+                        <input type = "hidden" formControlName-="userId"/>
+                        <input type="hidden" formControlName="userName" />
+                        <input type="text" formControlName="taskName"  name="taskName" class="form-control" placeholder="Task Name">
+                    </div>
+                </div>
+             </div>  
+             <!-- <div class="row mt-3">
+                <div class="col-12">
+                  <select class="form-control" formControlName="userId" [(ngModel)]="selectedUserId" name="userId">
+                    <option value="">Assign To</option>
+                    <option *ngFor="let user of users" [value]="user.id">{{ user.name }}</option>
+                  </select>
+                </div>
+             </div> -->
+             <div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <input type="date" formControlName="dueDate"  name="dueDate" class="form-control" placeholder="Due Date">
+                        <div *ngIf="dueDateControl?.hasError('pastDate') && dueDateControl?.touched" class="text-danger">
+                          Due date cannot be in the past.
+                        </div>
+                      
+                        <div *ngIf="dueDateControl?.hasError('required') && dueDateControl?.touched" class="text-danger">
+                          Due date is required.
+                        </div>
+                    </div>
+                </div>
+             </div> 
+             <div>
+              <div class="row mt-3">
+                <div class="col-12">
+                  <select formControlName="priority" class="form-control" id="priority" autocomplete="off">
+                      <option Value="" disabled>Priority</option>
+                      <option Value="Low">Low</option>
+                      <option Value="Medium">Medium</option>
+                      <option Value="High">High</option>
+                    </select>
+                  </div>
+              </div>
+             </div>
+             <div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <!-- <input type="text"  name="name" class="form-control" placeholder="Description"> -->
+                        <label for="taskDescription" class="form-label">Description</label>
+                        <textarea 
+                          name="taskDescription" 
+                          formControlName="taskDescription"
+                          id="taskDescription" 
+                          class="form-control" 
+                          rows="4" 
+                          placeholder="Enter task description">
+                        </textarea>
+                    </div>
+                </div>
+             </div> 
+             <div class="row mt-3">
+                <div class="col-12">
+                  <select formControlName="taskStatus" class="form-control" id="taskStatus" autocomplete="off">
+                      <option Value="" disabled>Status</option>
+                      <option Value="New">New</option>
+                      <option Value="InProgress">In-Progress</option>
+                      <option Value="Completed">Completed</option>
+                    </select>
+                  </div>
+              </div>
+        </div>
+  
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          @if(taskForm.value.taskId == 0){
+          <button type="submit" [disabled]="this.taskForm.invalid" class="btn btn-primary" data-bs-dismiss="modal" >Save</button>
+          }
+          @else{
+            <button type="submit" [disabled]="this.taskForm.invalid" class="btn btn-primary" data-bs-dismiss="modal" >Update</button>
+          }
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="closeModal()">Close</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  
