@@ -17,7 +17,7 @@ export class TasksService {
 
   private uploadTaskAPIUrl = 'https://localhost:7192/api/Tasks/upload';
 
-  private deleteTaskAPIURL = 'https://localhost:7192/api/Tasks';
+  private deleteTaskAPIURL = 'https://localhost:7192/api/Tasks/deleteTask';
 
   private updateTaskAPIURL = 'https://localhost:7192/api/Tasks/UpdateTask';
 

@@ -52,11 +52,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let task of taskList; let i = index">
+              <tr *ngFor="let task of taskLists; let i = index">
                 <td>{{ i + 1 }}</td>
-                <td>{{ task.title }}</td>
-                <td><span class="badge bg-info">{{ task.status }}</span></td>
-                <td>{{ task.assignedTo }}</td>
+                <td>{{ task.taskName }}</td>
+                <td><span class="badge bg-info">{{ task.taskStatus }}</span></td>
+                <td>{{ task.userName }}</td>
                 <td>{{ task.dueDate | date }}</td>
               </tr>
             </tbody>

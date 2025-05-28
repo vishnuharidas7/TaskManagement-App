@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { UserAuthService } from '../../Services/user-auth.service';
+import { UsersService } from '../../Services/users.service';
+import { Users } from '../../Models/users';
+import { TasksService } from '../../Services/tasks.service';
+import { Tasks } from '../../Models/tasks';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -11,11 +15,18 @@ import { UserAuthService } from '../../Services/user-auth.service';
 })
 export class AdminDashboardComponent implements OnInit {
 
+  userList:Users[]=[];
+  taskLists:Tasks[]=[];
+  userCount:number=0;
+  taskCount:number=0;
+
+
+  
   stats = [
-    { title: 'Total Tasks', count: 120 },
+    { title: 'Total Tasks', count: 0 },
     { title: 'Completed Tasks', count: 80 },
     { title: 'Pending Tasks', count: 40 },
-    { title: 'Total Users', count: 25 }
+    { title: 'Total Users', count:0}
   ];
 
   taskList = [
@@ -25,29 +36,39 @@ export class AdminDashboardComponent implements OnInit {
   ];
 
   
-  user?:any
-  constructor(private authService: UserAuthService) {
-    // this.authService.getCurrentAuthUser().subscribe((r)=>{
-    //   console.log(r);
-    //   this.user=r;
-
-    // });
-
-  }
+  
+  constructor(private authService: UserAuthService,private userService:UsersService,private taskService:TasksService) {  }
 
   ngOnInit() {
-    // const tokens = sessionStorage.getItem('JWT_TOKEN');
-    // if (tokens) {
-    //   const parsedTokens = JSON.parse(tokens);
-    //   const accessToken = parsedTokens.accessToken;
-    //   const refreshToken = parsedTokens.refreshToken;
-  
-    //   if (accessToken && refreshToken) {
-    //     this.authService.startRefreshTokenTimer(accessToken, refreshToken);
-    //   }
-    // }
+   
+    this.getUser();
+    this.getTask();
   }
   
+  getUser()
+ {
+  this.userService.getAllUsers().subscribe((res) => {
+    this.userList = res;
+    this.userCount=res.length;
+    const totalUsersStat=this.stats.find(stat=>stat.title==='Total Users');
+    if(totalUsersStat)
+    {
+      totalUsersStat.count=this.userCount;
+    }
+  });
+ }
+
+ getTask(){
+  this.taskService.getAllTasks().subscribe((res)=>{
+    this.taskLists=res;
+    this.taskCount=res.length;
+    const totalTaskStat=this.stats.find(stat=>stat.title=='Total Tasks');
+    if(totalTaskStat)
+    {
+      totalTaskStat.count=this.taskCount;
+    }
+  });
+ }
 
   logout(){
     this.authService.logout();
