@@ -11,7 +11,7 @@ export class UsersService {
 
   private addUserApiUrl = 'https://localhost:7192/api/Users/register'
 
-  private deleteUserApiUrl = 'https://localhost:7192/api/Users';
+  private deleteUserApiUrl = 'https://localhost:7192/api/Users/deleteUser';
 
   private updateUserApiUrl = 'https://localhost:7192/api/Users/updateuser';
 
