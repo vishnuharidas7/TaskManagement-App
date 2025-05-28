@@ -27,11 +27,11 @@ export class AdminDashboardComponent implements OnInit {
   
   user?:any
   constructor(private authService: UserAuthService) {
-    this.authService.getCurrentAuthUser().subscribe((r)=>{
-      console.log(r);
-      this.user=r;
+    // this.authService.getCurrentAuthUser().subscribe((r)=>{
+    //   console.log(r);
+    //   this.user=r;
 
-    });
+    // });
 
   }
 

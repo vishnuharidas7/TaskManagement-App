@@ -28,12 +28,19 @@ export class AuthUsersComponent {
     this.validationErrors = [];
 
     if(this.authService.isTokenExpired()){
-
       this.authService.refreshToken()?.subscribe({
         next:()=>{
           this.authService.login({ UserName: this.username, Password: this.password }).subscribe(()=>{
+            debugger
+            const role = localStorage.getItem('user_role');
+            if(role === '1'){
+              this.router.navigate(['/adminDashboard']);
+            }
+            else{
+              this.router.navigate(['/userDashboard']);
+            }
             alert("Login Succesfully");
-           this.router.navigate(['/']);
+           
            });
         },
         error:(err)=>{
@@ -45,8 +52,16 @@ export class AuthUsersComponent {
     else{
         this.authService.login({ UserName: this.username, Password: this.password }).subscribe({
           next:()=>{
+            const role = localStorage.getItem('user_role');
+            if(role === '1'){
+              this.router.navigate(['/adminDashboard']);
+            }
+            else{
+              this.router.navigate(['/userDashboard']);
+            }
             alert("Login Succesfully");
-            this.router.navigate(['/']);
+            // alert("Login Succesfully");
+            // this.router.navigate(['/']);
           },
           error:(err)=>{
             if(err.error?.message){

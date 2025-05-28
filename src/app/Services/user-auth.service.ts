@@ -4,10 +4,17 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
- 
+
+
+interface DecodedToken {
+  [key: string]: any;
+  role?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
+
 
 export class UserAuthService {
 
@@ -18,9 +25,9 @@ export class UserAuthService {
   constructor(private http: HttpClient, private router: Router) {}
 
   login(credentials: { UserName: string; Password: string }): Observable<any> {
-
     return this.http
-      .post('https://localhost:7268/api/Auth/login', credentials)
+      //.post('https://localhost:7268/api/Auth/login', credentials)
+      .post('https://localhost:7192/api/Auth/loginAuth', credentials)
       .pipe(
         tap((tokens: any) =>
           this.doLoginUser(credentials.UserName, tokens)
@@ -36,6 +43,9 @@ export class UserAuthService {
     this.startRefreshTokenTimer(tokens.accessToken, tokens.refreshToken);
     this.isAuthenticatedSubject.next(true);
 
+    const decoded: DecodedToken = jwtDecode(tokens.accessToken);
+      localStorage.setItem('user_role', decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
+
   }
  
   // private storeJwtToken(jwt: any): void {
@@ -50,9 +60,9 @@ export class UserAuthService {
     sessionStorage.setItem(this.JWT_TOKEN, JSON.stringify(tokens));
   }
 
-  getCurrentAuthUser(): Observable<any> {
-    return this.http.get('https://localhost:7268/api/Auth/me');
-  }
+  // getCurrentAuthUser(): Observable<any> {
+  //   return this.http.get('https://localhost:7268/api/Auth/me');
+  // }
  
   isLoggedIn(): boolean {
     return !!sessionStorage.getItem(this.JWT_TOKEN);
@@ -84,7 +94,8 @@ export class UserAuthService {
     const tokens = JSON.parse(tokensRaw);
     const { refreshToken } = tokens;
     return this.http
-      .post<any>('https://localhost:7268/api/Auth/refresh', {
+      //.post<any>('https://localhost:7268/api/Auth/refresh', 
+      .post<any>('https://localhost:7192/api/Auth/refresh',{
         
         refreshToken
 

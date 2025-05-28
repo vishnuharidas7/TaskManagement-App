@@ -21,6 +21,8 @@ export class TasksService {
 
   private updateTaskAPIURL = 'https://localhost:7192/api/Tasks/UpdateTask';
 
+  private userTaskAPIURL = 'https://localhost:7192/api/Tasks/task';
+
   constructor() { }
 
   http = inject(HttpClient)
@@ -55,6 +57,11 @@ export class TasksService {
     return this.http.post(this.uploadTaskAPIUrl, fileData, {
       responseType: 'text' as const  
     });
+  }
+
+  getUserTask(id: number)
+  {
+    return this.http.get<Tasks[]>(`${this.userTaskAPIURL}/${id}`);
   }
 
 }
