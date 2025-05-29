@@ -44,7 +44,7 @@ export class UserAuthService {
     this.isAuthenticatedSubject.next(true);
 
     const decoded: DecodedToken = jwtDecode(tokens.accessToken);
-      localStorage.setItem('user_role', decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
+      sessionStorage.setItem('user_role', decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
 
   }
  
