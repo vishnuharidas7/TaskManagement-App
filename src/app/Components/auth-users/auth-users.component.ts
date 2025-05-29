@@ -23,56 +23,87 @@ export class AuthUsersComponent {
     
   }
 
-  loginFunction(event:Event) {
+  // loginFunction(event:Event) {
+  //   debugger
+  //   event.preventDefault();
+  //   this.validationErrors = [];
+
+  //   if(this.authService.isTokenExpired()){
+  //     this.authService.refreshToken()?.subscribe({
+  //       next:()=>{
+  //         this.authService.login({ UserName: this.username, Password: this.password }).subscribe(()=>{
+  //          // debugger
+  //           const role = sessionStorage.getItem('user_role');
+  //           if(role === 'Admin'){
+  //             this.router.navigate(['/adminDashboard']);
+  //           }
+  //           else{
+  //             this.router.navigate(['/userDashboard']);
+  //           }
+  //           alert("Login Succesfully");
+           
+  //          });
+  //       },
+  //       error:(err)=>{
+  //         console.error("Login Failed",err);
+  //         alert('Login failed. Please check your credentials.')
+  //         this.router.navigate(['/login']);
+  //       }
+  //     });
+  //   }
+  //   else{
+  //       this.authService.login({ UserName: this.username, Password: this.password }).subscribe({
+  //         next:()=>{
+  //           const role = localStorage.getItem('user_role');
+  //           if(role === '1'){
+  //             this.router.navigate(['/adminDashboard']);
+  //           }
+  //           else{
+  //             this.router.navigate(['/userDashboard']);
+  //           }
+  //           alert("Login Succesfully");
+  //           // alert("Login Succesfully");
+  //           // this.router.navigate(['/']);
+  //         },
+  //         error:(err)=>{
+  //           if(err.error?.message){
+  //             alert("Login Failed: " + err.error.message);
+  //           }else{
+  //             alert("Login Failed. Please check your username and password.");
+  //           }
+  //         }       
+  //       });
+  //   }
+
+  // }
+
+  loginFunction(event: Event) {
     event.preventDefault();
     this.validationErrors = [];
-
-    if(this.authService.isTokenExpired()){
-      this.authService.refreshToken()?.subscribe({
-        next:()=>{
-          this.authService.login({ UserName: this.username, Password: this.password }).subscribe(()=>{
-            debugger
-            const role = localStorage.getItem('user_role');
-            if(role === '1'){
-              this.router.navigate(['/adminDashboard']);
-            }
-            else{
-              this.router.navigate(['/userDashboard']);
-            }
-            alert("Login Succesfully");
-           
-           });
-        },
-        error:(err)=>{
-          alert('Token refresh failed. Please log in again.')
-          this.router.navigate(['/login']);
+  
+    this.authService.login({ UserName: this.username, Password: this.password }).subscribe({
+      next: () => {
+        const role = sessionStorage.getItem('user_role');
+        console.log("User role:", role);
+  
+        alert("Login Successfully");
+  
+        if (role === 'Admin') {
+          this.router.navigate(['/adminDashboard']);
+        } else {
+          this.router.navigate(['/userDashboard']);
         }
-      });
-    }
-    else{
-        this.authService.login({ UserName: this.username, Password: this.password }).subscribe({
-          next:()=>{
-            const role = localStorage.getItem('user_role');
-            if(role === '1'){
-              this.router.navigate(['/adminDashboard']);
-            }
-            else{
-              this.router.navigate(['/userDashboard']);
-            }
-            alert("Login Succesfully");
-            // alert("Login Succesfully");
-            // this.router.navigate(['/']);
-          },
-          error:(err)=>{
-            if(err.error?.message){
-              alert("Login Failed: " + err.error.message);
-            }else{
-              alert("Login Failed. Please check your username and password.");
-            }
-          }       
-        });
-    }
-
+      },
+      error: (err) => {
+        console.error("Login Failed:", err);
+        if (err.error?.message) {
+          alert("Login Failed: " + err.error.message);
+        } else {
+          alert("Login Failed. Please check your credentials.");
+        }
+      }
+    });
   }
+  
    
 }
