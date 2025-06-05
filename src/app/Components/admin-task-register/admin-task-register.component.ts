@@ -148,7 +148,9 @@ get fileuploadControl()
       userId: ['',Validators.required],
       dueDate: ['',[Validators.required, this.noPastDateValidator]],
       taskDescription:['',Validators.required] ,
-      priority:['',Validators.required]     
+      priority:['',Validators.required],
+      userName: ['Ram'],
+      taskStatus:['']   
     });
 
     this.fileUploadForm = this.fb.group({
