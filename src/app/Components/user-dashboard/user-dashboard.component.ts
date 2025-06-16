@@ -1,11 +1,11 @@
-import { Component, ElementRef, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject,ErrorHandler} from '@angular/core';
 import { Tasks } from '../../Models/tasks';
 import { CommonModule } from '@angular/common';
 import { UserAuthService } from '../../Services/user-auth.service';
 import { AbstractControl, FormsModule,ReactiveFormsModule, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { TasksService } from '../../Services/tasks.service';
 import { jwtDecode } from 'jwt-decode';
-
+import { LoggerServiceService } from '../../Services/logger-service.service';
 @Component({
   selector: 'app-user-dashboard',
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
@@ -25,7 +25,7 @@ private readonly JWT_TOKEN = 'JWT_TOKEN';
 
   taskForm : FormGroup = new FormGroup({});
 
-  constructor(private authService: UserAuthService, private fb:FormBuilder) {}
+  constructor(private authService: UserAuthService, private fb:FormBuilder,private logger:LoggerServiceService,private errorHandler:ErrorHandler) {}
 
   ngOnInit(): void {
     //this.loadUserTasks();
@@ -191,6 +191,11 @@ private readonly JWT_TOKEN = 'JWT_TOKEN';
           this.taskForm.reset();
           this.closeModal();
           this.getTasks();
+        },  error: (err) => {
+         
+          this.logger.error('Task Added Faild', err); 
+          this.errorHandler.handleError(err);               
+          alert(`Faild task added. Please try again.`);
         }});
       }
      else{
@@ -201,6 +206,11 @@ private readonly JWT_TOKEN = 'JWT_TOKEN';
           this.taskForm.reset();
           this.closeModal();
           this.getTasks();
+        },error: (err) => {
+         
+          this.logger.error('Task Updation Faild', err); 
+          this.errorHandler.handleError(err);               
+          alert(`Faild task added. Please try again.`);
         }});
      } 
   }
@@ -212,10 +222,20 @@ private readonly JWT_TOKEN = 'JWT_TOKEN';
       console.error('User ID not found in token');
       return;
     }
-    this.taskService.getUserTask(userId).subscribe((res) => {
-      this.tasks = res;
-      this.countTaskStatuses(); 
-    })
+    this.taskService.getUserTask(userId).subscribe({
+      next: (res) => {
+        this.tasks = res;
+        this.countTaskStatuses();
+      },
+      error: (err) => {
+        const message = 'Failed to load user tasks';
+        console.error(message, err);
+  
+        this.logger.error(message, err);     
+        this.errorHandler.handleError(err);   
+        alert("Could not fetch tasks. Please try again later.");
+      }
+    });
   }
 
   onEdit(Task:Tasks)
@@ -231,13 +251,24 @@ private readonly JWT_TOKEN = 'JWT_TOKEN';
   onDelete(id : number)
   {
     const isconfirm = confirm("Are you sure you want to delete this Task?");
-    if(isconfirm)
-    {
-      this.taskService.deleteTask(id).subscribe((res) => {
-        alert("Task deleted successfully....");
-        this.getTasks();
-      });
+    if (!isconfirm) return;
+
+  this.taskService.deleteTask(id).subscribe({
+    next: () => {
+      alert("Task deleted successfully.");
+      this.logger.info(`Task with ID ${id} deleted successfully`);
+      this.getTasks();
+    },
+    error: (err) => {
+      const message = `Failed to delete task with ID ${id}`;
+      console.error(message, err);
+
+      this.logger.error(message, err);
+      this.errorHandler.handleError(err);
+
+      alert("Failed to delete the task. Please try again later.");
     }
+  });
   }
 
 }

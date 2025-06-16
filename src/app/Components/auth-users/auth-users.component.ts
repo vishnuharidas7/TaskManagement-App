@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component,ErrorHandler } from '@angular/core';
 import { UserAuthService } from '../../Services/user-auth.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { LoggerServiceService } from '../../Services/logger-service.service';
 
 
 @Component({
@@ -17,65 +18,13 @@ export class AuthUsersComponent {
  
   validationErrors: string[] = [];
 
-  constructor(private authService: UserAuthService, private router: Router) {}
+  constructor(private authService: UserAuthService, private router: Router,private logger:LoggerServiceService,private errorHandler:ErrorHandler) {}
 
   ngOnInit(): void {  
     
   }
 
-  // loginFunction(event:Event) {
-  //   debugger
-  //   event.preventDefault();
-  //   this.validationErrors = [];
-
-  //   if(this.authService.isTokenExpired()){
-  //     this.authService.refreshToken()?.subscribe({
-  //       next:()=>{
-  //         this.authService.login({ UserName: this.username, Password: this.password }).subscribe(()=>{
-  //          // debugger
-  //           const role = sessionStorage.getItem('user_role');
-  //           if(role === 'Admin'){
-  //             this.router.navigate(['/adminDashboard']);
-  //           }
-  //           else{
-  //             this.router.navigate(['/userDashboard']);
-  //           }
-  //           alert("Login Succesfully");
-           
-  //          });
-  //       },
-  //       error:(err)=>{
-  //         console.error("Login Failed",err);
-  //         alert('Login failed. Please check your credentials.')
-  //         this.router.navigate(['/login']);
-  //       }
-  //     });
-  //   }
-  //   else{
-  //       this.authService.login({ UserName: this.username, Password: this.password }).subscribe({
-  //         next:()=>{
-  //           const role = localStorage.getItem('user_role');
-  //           if(role === '1'){
-  //             this.router.navigate(['/adminDashboard']);
-  //           }
-  //           else{
-  //             this.router.navigate(['/userDashboard']);
-  //           }
-  //           alert("Login Succesfully");
-  //           // alert("Login Succesfully");
-  //           // this.router.navigate(['/']);
-  //         },
-  //         error:(err)=>{
-  //           if(err.error?.message){
-  //             alert("Login Failed: " + err.error.message);
-  //           }else{
-  //             alert("Login Failed. Please check your username and password.");
-  //           }
-  //         }       
-  //       });
-  //   }
-
-  // }
+ 
 
   loginFunction(event: Event) {
     event.preventDefault();
@@ -85,8 +34,8 @@ export class AuthUsersComponent {
       next: () => {
         const role = sessionStorage.getItem('user_role');
         console.log("User role:", role);
-  
         alert("Login Successfully");
+        this.logger.info("UI-Login successfully");
   
         if (role === 'Admin') {
           this.router.navigate(['/adminDashboard']);
@@ -96,10 +45,13 @@ export class AuthUsersComponent {
       },
       error: (err) => {
         console.error("Login Failed:", err);
+        this.logger.error("Login failed", err)
         if (err.error?.message) {
           alert("Login Failed: " + err.error.message);
+          this.errorHandler.handleError(err);
         } else {
           alert("Login Failed. Please check your credentials.");
+          this.errorHandler.handleError(err);
         }
       }
     });

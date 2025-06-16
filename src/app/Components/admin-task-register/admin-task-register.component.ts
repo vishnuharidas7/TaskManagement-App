@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, NgModule, ViewChild, inject, viewChild } from '@angular/core';
+import { Component, ElementRef, NgModule, ViewChild, inject, viewChild,ErrorHandler } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { TasksService } from '../../Services/tasks.service';
 import { FormGroup, FormsModule,FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Tasks } from '../../Models/tasks';
+import { LoggerServiceService } from '../../Services/logger-service.service';
 
 interface User {
   id: number;
@@ -50,7 +51,7 @@ export class AdminTaskRegisterComponent {
   ];
   //ends here
 
-  constructor(private fb:FormBuilder) {}
+  constructor(private fb:FormBuilder,private logger:LoggerServiceService,private errorHandler:ErrorHandler) {}
 
   
   
@@ -94,28 +95,49 @@ export class AdminTaskRegisterComponent {
 
 
   getUsers(): void {
-    this.taskService.getAllUsers().subscribe((res) => {
-      this.users = res;
-    })
+    this.taskService.getAllUsers().subscribe({
+      next: (res) => {
+        this.users = res;
+      },
+      error: (err) => {
+        this.logger.error("Failed to fetch users", err);         
+        this.errorHandler.handleError(err);                     
+        alert("Unable to load users. Please try again later."); 
+      }
+    });
   }
 
   getTasks() {
-  this.taskService.getAllTasks().subscribe((res) => {
-    this.tasks = res;
-  })
-}
+    this.taskService.getAllTasks().subscribe({
+      next: (res) => {
+        this.tasks = res;
+      },
+      error: (err) => {
+        this.logger.error("Failed to fetch tasks", err);         
+        this.errorHandler.handleError(err);                     
+        alert("Unable to load tasks. Please try again later.");  
+      }
+    });
+  }
+  
 
-onDelete(id : number)
-  {
-    const isconfirm = confirm("Are you sure you want to delete this Task?");
-    if(isconfirm)
-    {
-      this.taskService.deleteTask(id).subscribe((res) => {
-        alert("Task deleted successfully....");
-        this.getTasks();
+  onDelete(id: number) {
+    const isConfirm = confirm("Are you sure you want to delete this Task?");
+    if (isConfirm) {
+      this.taskService.deleteTask(id).subscribe({
+        next: (res) => {
+          alert("Task deleted successfully.");
+          this.getTasks(); 
+        },
+        error: (err) => {
+          this.logger.error("Failed to delete task", err);        
+          this.errorHandler.handleError(err);                     
+          alert("Failed to delete the task. Please try again later."); 
+        }
       });
     }
   }
+  
 
   toDateInputFormat(date: any): string {
     return new Date(date).toISOString().split('T')[0];
@@ -181,7 +203,12 @@ get fileuploadControl()
           this.taskForm.reset();
           this.closeModal();
           this.getTasks();
-        }});
+        }, error: (err) => {
+          this.logger.error("Failed to add task", err);
+          this.errorHandler.handleError(err);
+          alert("Failed to add task. Please try again.");
+        }
+      });
       }
      else{
       this.taskService.updateTask(this.formValue).subscribe({
@@ -191,7 +218,13 @@ get fileuploadControl()
           this.taskForm.reset();
           this.closeModal();
           this.getTasks();
-        }});
+        },
+        error: (err) => {
+          this.logger.error("Failed to update task", err);
+          this.errorHandler.handleError(err);
+          alert("Failed to update task. Please try again.");
+        }
+      });
      } 
   }
 
@@ -239,12 +272,15 @@ onFileUpload() {
         }
       },
       error: (err) => {
+        this.logger.error('❌ File upload error', err);
+        this.errorHandler.handleError(err);
         alert('❌ File upload failed. Please try again.');
         this.fileUploadError = 'File upload failed. Please try again.';
       }
     });
   } else {
     alert('⚠️ Please select a file before uploading.');
+    this.logger.warn('File upload attempted without selecting a file');
     this.fileUploadError = 'Please select a file before uploading.';
   }
 }
