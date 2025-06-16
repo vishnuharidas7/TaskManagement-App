@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component,ErrorHandler, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { UserAuthService } from '../../Services/user-auth.service';
@@ -6,6 +6,7 @@ import { UsersService } from '../../Services/users.service';
 import { Users } from '../../Models/users';
 import { TasksService } from '../../Services/tasks.service';
 import { Tasks } from '../../Models/tasks';
+import { LoggerServiceService } from '../../Services/logger-service.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -37,7 +38,8 @@ export class AdminDashboardComponent implements OnInit {
 
   
   
-  constructor(private authService: UserAuthService,private userService:UsersService,private taskService:TasksService) {  }
+  constructor(private authService: UserAuthService,private userService:UsersService,private taskService:TasksService,
+    private logger:LoggerServiceService,private errorHandler:ErrorHandler) {  }
 
   ngOnInit() {
    
@@ -45,30 +47,52 @@ export class AdminDashboardComponent implements OnInit {
     this.getTask();
   }
   
-  getUser()
- {
-  this.userService.getAllUsers().subscribe((res) => {
-    this.userList = res;
-    this.userCount=res.length;
-    const totalUsersStat=this.stats.find(stat=>stat.title==='Total Users');
-    if(totalUsersStat)
-    {
-      totalUsersStat.count=this.userCount;
-    }
-  });
- }
+  getUser() {
+    this.userService.getAllUsers().subscribe({
+      next: (res) => {
+        this.userList = res;
+        this.userCount = res.length;
+        const totalUsersStat = this.stats.find(stat => stat.title === 'Total Users');
+        if (totalUsersStat) {
+          totalUsersStat.count = this.userCount;
+        }
+      },
+      error: (err) => {
+        this.logger.error("Failed to load user list", err); 
+        this.errorHandler.handleError(err); 
+        alert("Failed to load users.");
+      }
+    });
+  }
 
- getTask(){
-  this.taskService.getAllTasks().subscribe((res)=>{
-    this.taskLists=res;
-    this.taskCount=res.length;
-    const totalTaskStat=this.stats.find(stat=>stat.title=='Total Tasks');
-    if(totalTaskStat)
-    {
-      totalTaskStat.count=this.taskCount;
-    }
-  });
- }
+
+//  getTask(){
+//   this.taskService.getAllTasks().subscribe((res)=>{
+//     this.taskLists=res;
+//     this.taskCount=res.length;
+//     const totalTaskStat=this.stats.find(stat=>stat.title=='Total Tasks');
+//     if(totalTaskStat)
+//     {
+//       totalTaskStat.count=this.taskCount;
+//     }
+//   });
+//  }
+ 
+getTask(){
+  this.taskService.getAllTasks().subscribe({next:(res)=>{this.taskLists=res;this.taskCount=res.length;
+  const totalTaskStat=this.stats.find(stat=>stat.title==='Total Tasks');
+  if(totalTaskStat)
+  {
+   totalTaskStat.count=this.taskCount;
+  }
+  },
+  error:(err)=>{
+    this.logger.error("Failed to load task list",err);
+    this.errorHandler.handleError(err);
+    alert("Faild to load tasks.")
+  }       
+})
+}
 
   logout(){
     this.authService.logout();
