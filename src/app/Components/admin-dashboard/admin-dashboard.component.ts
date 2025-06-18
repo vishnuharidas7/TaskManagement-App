@@ -1,4 +1,4 @@
-import { Component,ErrorHandler, OnInit } from '@angular/core';
+import { Component,ErrorHandler, OnInit,HostListener} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { UserAuthService } from '../../Services/user-auth.service';
@@ -7,6 +7,9 @@ import { Users } from '../../Models/users';
 import { TasksService } from '../../Services/tasks.service';
 import { Tasks } from '../../Models/tasks';
 import { LoggerServiceService } from '../../Services/logger-service.service';
+import { interval,Subscription } from 'rxjs';
+import { timer } from 'rxjs';
+import { NotificationTask } from '../../Models/notificationTask';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -15,6 +18,11 @@ import { LoggerServiceService } from '../../Services/logger-service.service';
   styleUrl: './admin-dashboard.component.css'
 })
 export class AdminDashboardComponent implements OnInit {
+
+  private notificationSubscription?: Subscription;
+  notificationDropdownVisible=false;
+  notifications:NotificationTask[]=[];
+  private readonly JWT_TOKEN = 'JWT_TOKEN';
 
   userList:Users[]=[];
   taskLists:Tasks[]=[];
@@ -45,8 +53,30 @@ export class AdminDashboardComponent implements OnInit {
    
     this.getUser();
     this.getTask();
+
+    this.notificationSubscription=timer(10000).subscribe(()=>{this.loadNotification();this.notificationSubscription?.unsubscribe()})
   }
-  
+  ngOnDestroy():void{
+    this.notificationSubscription?.unsubscribe();
+  }
+
+  toggleNotificationDropdown(){
+    this.notificationDropdownVisible=!this.notificationDropdownVisible;
+  }
+
+  @HostListener('document:click',['$event'])
+  onDocumentClick(event:MouseEvent){
+    const targets=event.target as HTMLElement;
+
+    const bell=document.querySelector('.notification-bell');
+    const dropdown=document.querySelector('.notification-dropdown');
+
+    if(bell?.contains(targets)||dropdown?.contains(targets)){
+      return;
+    }
+    this.notificationDropdownVisible=false;
+  }
+
   getUser() {
     this.userService.getAllUsers().subscribe({
       next: (res) => {
@@ -96,5 +126,44 @@ getTask(){
 
   logout(){
     this.authService.logout();
+  }
+
+  getUserInformationFromToken(): {userId:number,role:string} | null {
+    const token = sessionStorage.getItem(this.JWT_TOKEN);
+    //const token = localStorage.getItem('token');  // or wherever you store it
+  
+    if (!token) return null;
+  
+    try {
+      // JWT format: header.payload.signature
+      const payloadBase64 = token.split('.')[1];
+      const payloadJson = atob(payloadBase64);
+      const payload = JSON.parse(payloadJson);
+  
+      // Extract the userId from the specific claim
+      const userIdString = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+      const roleString = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+      
+      if (!userIdString || !roleString) return null;
+  
+      return{
+        userId:parseInt(userIdString,10),
+        role:roleString
+      }
+  
+    } catch (error) {
+      console.error('Error parsing JWT token:', error);
+      return null;
+    }
+  }
+
+  loadNotification(){
+    this.taskService.getTaskNotificationAdmin().subscribe({
+      next: (data) => {
+        this.notifications = data;
+      },
+      error: (err) => console.error('Failed to load notifications:', err)
+    });
+
   }
 }
