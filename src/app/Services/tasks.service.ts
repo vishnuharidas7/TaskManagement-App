@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Users } from '../Models/users';
 import { Tasks } from '../Models/tasks';
 import { Observable } from 'rxjs';
+import { NotificationTask } from '../Models/notificationTask';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,10 @@ export class TasksService {
   private updateTaskAPIURL = 'https://localhost:7192/api/Tasks/UpdateTask';
 
   private userTaskAPIURL = 'https://localhost:7192/api/Tasks/task';
+
+  private taskNotification='https://localhost:7192/api/Tasks/taskNotification';
+
+  private taskNotificationAdmin='https://localhost:7192/api/Tasks/taskNotificationAdmin';
 
   constructor() { }
 
@@ -63,6 +68,17 @@ export class TasksService {
   getUserTask(id: number)
   {
     return this.http.get<Tasks[]>(`${this.userTaskAPIURL}/${id}`);
+  }
+
+  getTaskNotification(id:number)
+  {
+    return this.http.get<NotificationTask[]>(`${this.taskNotification}/${id}`)
+
+  }
+  getTaskNotificationAdmin()
+  {
+    return this.http.get<NotificationTask[]>(`${this.taskNotificationAdmin}`)
+
   }
 
 }

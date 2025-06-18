@@ -35,3 +35,40 @@
   li:hover{
     background-color: rgb(200, 158, 145);
   }
+
+  .notification-bell {
+    position: relative;
+    cursor: pointer;
+    display: inline-block; 
+  }
+
+  .notification-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .notification-count {
+    background-color: red;
+  color: white;
+  border-radius: 50%;
+  font-size: 12px;
+  padding: 2px 6px;
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  }
+  
+  .notification-dropdown {
+    position: absolute;
+    top: 120%; /* Adjust depending on your bell size */
+    right: 0;
+    width: 300px;
+    z-index: 1000;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  

@@ -51,11 +51,10 @@ const Payload={
 };
 
 this.http.post(this.backendurl,Payload)
-.subscribe({next:()=>{},error:err=>console.error('Faild to send log to backend',err)});
+.subscribe({
+  next:()=>{},
+  error:err=>console.error('Faild to send log to backend',err)});
 }
-
-
-
 }
 
 

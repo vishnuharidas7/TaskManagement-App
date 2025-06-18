@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, inject,ErrorHandler} from '@angular/core';
+import { Component, ElementRef, ViewChild, inject,ErrorHandler,HostListener} from '@angular/core';
 import { Tasks } from '../../Models/tasks';
 import { CommonModule } from '@angular/common';
 import { UserAuthService } from '../../Services/user-auth.service';
@@ -6,6 +6,9 @@ import { AbstractControl, FormsModule,ReactiveFormsModule, FormBuilder, FormGrou
 import { TasksService } from '../../Services/tasks.service';
 import { jwtDecode } from 'jwt-decode';
 import { LoggerServiceService } from '../../Services/logger-service.service';
+import { NotificationTask } from '../../Models/notificationTask';
+import { interval,Subscription } from 'rxjs';
+import { timer } from 'rxjs';
 @Component({
   selector: 'app-user-dashboard',
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
@@ -15,11 +18,14 @@ import { LoggerServiceService } from '../../Services/logger-service.service';
 export class UserDashboardComponent {
 @ViewChild('myModal') model : ElementRef | undefined;
 private readonly JWT_TOKEN = 'JWT_TOKEN';
+private notificationSubscription?: Subscription;
+notificationDropdownVisible=false;
 
   tasks: Tasks[] = [];
   assignedTasksCount: number = 0;
   inProgressTasksCount: number = 0;
   completedTasksCount: number = 0;
+  notifications:NotificationTask[]=[];
 
   taskService = inject(TasksService);
 
@@ -31,8 +37,31 @@ private readonly JWT_TOKEN = 'JWT_TOKEN';
     //this.loadUserTasks();
     this.setFormState();
     this.getTasks();
+
+    this.notificationSubscription=timer(10000).subscribe(()=>{this.loadNotification();this.notificationSubscription?.unsubscribe()})
+  }
+  ngOnDestroy():void{
+    this.notificationSubscription?.unsubscribe();
   }
 
+  toggleNotificationDropdown(){
+    this.notificationDropdownVisible=!this.notificationDropdownVisible;
+  }
+
+  @HostListener('document:click',['$event'])
+  onDocumentClick(event:MouseEvent){
+    const targets=event.target as HTMLElement;
+
+    const bell=document.querySelector('.notification-bell');
+    const dropdown=document.querySelector('.notification-dropdown');
+
+    if(bell?.contains(targets)||dropdown?.contains(targets)){
+      return;
+    }
+    this.notificationDropdownVisible=false;
+  }
+
+  
   openModal(){
     const createTask = document.getElementById('myModal');
     if(createTask != null)
@@ -73,43 +102,6 @@ private readonly JWT_TOKEN = 'JWT_TOKEN';
     }); 
   }
 
-  // loadUserTasks(): void {
-  //   // Ideally, replace this with a call to a backend service
-  //   this.tasks = [
-  //     {
-  //       taskName: 'Fix UI bug on task page',
-  //       taskStatus: 'Assigned',
-  //       dueDate: new Date('2025-06-01'),
-  //       userName: 'SAam'
-  //       ,userId: 1,
-  //       taskDescription:'',
-  //       taskId:1,
-  //       priority: 'High'
-  //     },
-  //     {
-  //       taskName: 'Write user guide documentation',
-  //       taskStatus: 'In Progress',
-  //       dueDate: new Date('2025-06-03'),
-  //       userName: 'SAM'
-  //       ,userId: 1,
-  //       taskDescription: '',
-  //       taskId:1,
-  //       priority: 'Medium'
-  //     },
-  //     {
-  //       taskName: 'Code review for sprint 5',
-  //       taskStatus: 'Completed',
-  //       dueDate: new Date('2025-05-20'),
-  //       userName: 'Sam',
-  //       userId: 1,
-  //       taskDescription:'',
-  //       taskId:1
-  //      , priority: 'Low'
-  //     }
-  //   ];
-
-  //   this.countTaskStatuses();
-  // }
 
   countTaskStatuses(): void {
     this.assignedTasksCount = this.tasks.filter(t => t.taskStatus === 'New').length;
@@ -269,6 +261,22 @@ private readonly JWT_TOKEN = 'JWT_TOKEN';
       alert("Failed to delete the task. Please try again later.");
     }
   });
+  }
+
+  loadNotification(){
+    const userId = this.getUserIdFromToken();
+    if(userId===null)
+    {
+      console.error('User ID not found in token');
+      return;
+    }
+    this.taskService.getTaskNotification(userId).subscribe({
+      next: (data) => {
+        this.notifications = data;
+      },
+      error: (err) => console.error('Failed to load notifications:', err)
+    });
+
   }
 
 }
