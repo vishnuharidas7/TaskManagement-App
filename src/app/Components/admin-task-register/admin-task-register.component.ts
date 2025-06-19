@@ -160,7 +160,6 @@ get fileuploadControl()
 
   formValue: any;
   onSubmit(){
-    debugger
     console.log(this.taskForm.value);
     if(this.taskForm.invalid)
     {
@@ -171,9 +170,7 @@ get fileuploadControl()
     
     console.log(this.taskForm.value.taskid);
     console.log(this.taskForm.value.id);
-    if(this.taskForm.value.taskId == 0){
-      debugger
-     
+    if(this.taskForm.value.taskId == 0){    
       this.taskService.addTask(this.formValue).subscribe({
         next: () => {
           alert('Task Added Successfully....');
@@ -228,12 +225,14 @@ onFileUpload() {
       next: (response: string) => {
         if (response.trim().toLowerCase() === 'file processed and tasks saved.') {
           alert('✅ File uploaded and data saved successfully!');
+          this.taskForm.reset();
           this.fileUploadError = '';
           this.closeModal();
           this.getTasks();
         } else {
           alert('❌ Upload failed: ' + response);
           this.fileUploadError = response;
+          this.taskForm.reset();
           this.closeModal();
           this.getTasks();
         }
