@@ -6,7 +6,7 @@
       <li class="nav-item"><a class="nav-link text-white" routerLink="/adminDashboard">Dashboard</a></li>
       <li class="nav-item"><a class="nav-link text-white" routerLink="/adminTask">Tasks</a></li>
       <li class="nav-item"><a class="nav-link text-white" routerLink="/users" routerLinkActive="active">Users</a></li>
-      <li class="nav-item"><a class="nav-link text-white" routerLink="/settings">Settings</a></li>
+      <li class="nav-item"><a class="nav-link text-white" (click)="goToSettingsOpenModal()">Settings</a></li>
     </ul>
   </div>
 
@@ -75,6 +75,100 @@
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="modal" id="settingsModel" #settingsModel>
+    <div class="modal-dialog">
+      <div class="modal-content">
+   
+        <div class="modal-header" style="background-color: #a2b0c5;">
+            
+                <h5 class="modal-title">Update Admin</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="closeGotoSettingModal()"></button>
+          </div>
+  
+        <form [formGroup]="userFormSettings">
+        <!-- Modal body -->
+        <div class="modal-body">
+         <div>
+            <div class="row">
+                <div class="col-12">
+                    <input type="text" formControlName="name" name="name" class="form-control" placeholder="Name">
+                </div>
+            </div>
+         </div>   
+         <div class="row mt-3">
+            <div class="col-12">
+                <input type="text" formControlName="userName" name="userName" class="form-control" placeholder="UserName">
+                <div *ngIf="userNameControl?.touched && userNameControl?.errors?.['usernameTaken']" class="text-danger mt-1"
+                style="font-size: 11px; margin-left: 10px;">
+                    *This username is already taken.
+                  </div>
+            </div>
+         </div>
+         <div class="row mt-3">
+            <div class="col-6">
+                <input type="email" formControlName="email" name="email" class="form-control" placeholder="Email">
+                <div *ngIf="emailControl?.errors?.['required']" class="text-danger mt-1"
+                style="font-size: 11px; margin-left: 10px;">*Email is required.</div>
+                <div *ngIf="emailControl?.errors?.['email']"class="text-danger mt-1"
+                style="font-size: 11px; margin-left: 10px;">Email format is invalid.</div>
+                <div *ngIf="emailControl?.errors?.['pattern']" class="text-danger mt-1"
+                style="font-size: 11px; margin-left: 10px;">Email must include a valid domain (like .com, .org).</div>
+                <div *ngIf="emailControl?.errors?.['emailExists']" class="text-danger mt-1"
+                    style="font-size: 11px; margin-left: 10px;">This email is already registered.
+                </div>
+            </div>
+            <div class="col-6">
+                <input type="password" formControlName="password" name="password" class="form-control" placeholder="Password">
+            </div>
+         </div>
+         <div class="row mt-3">
+            <div class="col-6">
+                <input type="text" formControlName="phoneNumber" name="phoneNumber" class="form-control" placeholder="Phone Number">
+                <div *ngIf="phoneNumberControl?.touched && phoneNumberControl?.invalid" class="text-danger mt-1">
+                    <div *ngIf="phoneNumberControl?.errors?.['required']" class="text-danger mt-1" 
+                    style="font-size: 11px; margin-left: 10px;">Phone number is required.</div>
+                    <div *ngIf="phoneNumberControl?.errors?.['minlength']" class="text-danger mt-1"
+                    style="font-size: 11px; margin-left: 10px;">Phone number must be 10 digits.</div>
+                    <div *ngIf="phoneNumberControl?.errors?.['maxlength']" class="text-danger mt-1"
+                    style="font-size: 11px; margin-left: 10px;">Phone number must be 10 digits.</div>
+                    <div *ngIf="phoneNumberControl?.errors?.['pattern']" class="text-danger mt-1"
+                    style="font-size: 11px; margin-left: 10px;">Phone number must contain only digits.</div>
+                  </div>
+            </div>
+            <div class="col-6">
+                <select formControlName="gender" class="form-control" id="gender" autocomplete="off">
+                    <option Value="" disabled>Select Gender</option>
+                    <option Value="Male">Male</option>
+                    <option Value="Female">Female</option>
+                    <option Value="Other">Other</option>
+                  </select>
+            </div>
+        </div>
+         <!-- <div class="row mt-3">
+            <div class="col-6"> 
+                <label for="roleid" class="form-label"  style="margin-left: 10px;">Role</label>
+                <select formControlName="roleid" class="form-control" id="roleid" autocomplete="off">
+                    <option [value]="" disabled>Select Role</option>
+                    <option [value]="1">Admin</option>
+                    <option [value]="2">User</option>
+                  </select>
+            </div>
+         </div> -->
+        </div>
+  
+        <!-- Modal footer -->
+        <div class="modal-footer">
+           
+            <button type="submit"  class="btn btn-success" data-bs-dismiss="modal" (click)="updateUser()">Update</button>
+        
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="closeGotoSettingModal()">Close</button>
+        </div>
+        </form>
       </div>
     </div>
   </div>
