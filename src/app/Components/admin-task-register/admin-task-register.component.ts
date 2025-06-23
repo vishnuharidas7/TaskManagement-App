@@ -34,22 +34,67 @@ export class AdminTaskRegisterComponent {
   //fileUploadForm: FormGroup;
   selectedFile: File | null = null;
   fileUploadError: string = '';
+  private readonly JWT_TOKEN = 'JWT_TOKEN';
+
   
 
-  //hardcoded values
-  stats = [
-    { title: 'Total Tasks', count: 120 },
-    { title: 'Completed Tasks', count: 80 },
-    { title: 'Pending Tasks', count: 40 },
-    { title: 'Total Users', count: 25 }
-  ];
+// //Pagination 
+// currentPage: number = 1;
+// pageSize: number = 10;
+// get paginatedTasks() {
+//   const start = (this.currentPage - 1) * this.pageSize;
+//   return this.tasks.slice(start, start + this.pageSize);
+// }
 
-  taskList = [
-    { title: 'Design Homepage', status: 'In Progress', assignedTo: 'John', dueDate: new Date() },
-    { title: 'Database Backup', status: 'Completed', assignedTo: 'Alice', dueDate: new Date() },
-    { title: 'Bug Fixes', status: 'Pending', assignedTo: 'Mike', dueDate: new Date() }
-  ];
-  //ends here
+// get totalPages(): number {
+//   return Math.ceil(this.tasks.length / this.pageSize);
+// }
+// //Ends here
+
+filters = {
+  name: '',
+  date: '',
+  status: '',
+  priority: ''
+};
+
+statuses: string[] = ['New', 'OnDue', 'Completed']; // customize as needed
+priorities: string[] = ['Low', 'Medium', 'High']; // customize as needed
+
+allTasks: Tasks[] = []; // original data
+filteredTasks: Tasks[] = [];
+paginatedTasks: Tasks[] = [];
+currentPage: number = 1;
+pageSize: number = 10;
+totalPages: number = 1;
+
+applyFilters(): void {
+  const { name, date, status, priority } = this.filters;
+
+  this.filteredTasks = this.allTasks.filter(task => {
+    const matchesName = name ? task.userName.toLowerCase().includes(name.toLowerCase()) : true;
+    const matchesDate = date ? new Date(task.dueDate).toDateString() === new Date(date).toDateString() : true;
+    const matchesStatus = status ? task.taskStatus === status : true;
+    const matchesPriority = priority ? task.priority === priority : true;
+
+    return matchesName && matchesDate && matchesStatus && matchesPriority;
+  });
+
+  this.totalPages = Math.ceil(this.filteredTasks.length / this.pageSize);
+  this.currentPage = 1; // reset to first page
+  this.updatePaginatedTasks();
+}
+
+updatePaginatedTasks(): void {
+  const start = (this.currentPage - 1) * this.pageSize;
+  const end = start + this.pageSize;
+  this.paginatedTasks = this.filteredTasks.slice(start, end);
+}
+
+goToPage(page: number): void {
+  this.currentPage = page;
+  this.updatePaginatedTasks();
+}
 
   constructor(private fb:FormBuilder,private logger:LoggerServiceService,private errorHandler:ErrorHandler) {}
 
@@ -61,6 +106,49 @@ export class AdminTaskRegisterComponent {
     this.getUsers();
     this.getTasks();
   }
+
+  // Addded to fetch created by userid
+
+  getUserIdFromToken(): {userId:number} | null {
+    const token = sessionStorage.getItem(this.JWT_TOKEN);
+    //const token = localStorage.getItem('token');  // or wherever you store it
+  
+    if (!token) return null;
+  
+    try {
+      // JWT format: header.payload.signature
+      const payloadBase64 = token.split('.')[1];
+      const payloadJson = atob(payloadBase64);
+      const payload = JSON.parse(payloadJson);
+  
+      // Extract the userId from the specific claim
+      const userIdString = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+      
+      if (!userIdString) return null;
+  
+      return{
+        userId:parseInt(userIdString,10)
+      }
+  
+    } catch (error) {
+      console.error('Error parsing JWT token:', error);
+      return null;
+    }
+  }
+
+  // getUserIdFromToken(): number {
+  //   const token = localStorage.getItem('access_token'); // Adjust based on where you store it
+  //   if (!token) return 0;
+  
+  //   try {
+  //     const payload = JSON.parse(atob(token.split('.')[1])); // Decode JWT
+  //     return payload.userId || 0; // Adjust based on token structure
+  //   } catch (e) {
+  //     console.error('Invalid token', e);
+  //     return 0;
+  //   }
+  // }
+  //Ends here
 
   openModal(){
     const createTask = document.getElementById('myModal');
@@ -108,9 +196,14 @@ export class AdminTaskRegisterComponent {
   }
 
   getTasks() {
+    // this.taskService.getAllTasks().subscribe({
+    //   next: (res) => {
+    //     this.tasks = res;
     this.taskService.getAllTasks().subscribe({
       next: (res) => {
         this.tasks = res;
+        this.allTasks = res; // ✅ Needed for filtering
+        this.applyFilters();
       },
       error: (err) => {
         this.logger.error("Failed to fetch tasks", err);         
@@ -164,6 +257,9 @@ get fileuploadControl()
 
   setFormState()
   {
+
+    const createdbyID = this.getUserIdFromToken();
+
     this.taskForm = this.fb.group({
       taskId: 0,
       taskName: ['',[Validators.required]],
@@ -172,7 +268,8 @@ get fileuploadControl()
       taskDescription:['',Validators.required] ,
       priority:['',Validators.required],
       userName: ['Ram'],
-      taskStatus:['']   
+      taskStatus:[''],
+      createdBy:createdbyID?.userId 
     });
 
     this.fileUploadForm = this.fb.group({
@@ -182,7 +279,6 @@ get fileuploadControl()
 
   formValue: any;
   onSubmit(){
-    //debugger
     console.log(this.taskForm.value);
     if(this.taskForm.invalid)
     {
@@ -193,9 +289,7 @@ get fileuploadControl()
     
     console.log(this.taskForm.value.taskid);
     console.log(this.taskForm.value.id);
-    if(this.taskForm.value.taskId == 0){
-      //debugger
-     
+    if(this.taskForm.value.taskId == 0){    
       this.taskService.addTask(this.formValue).subscribe({
         next: () => {
           alert('Task Added Successfully....');
@@ -261,12 +355,14 @@ onFileUpload() {
       next: (response: string) => {
         if (response.trim().toLowerCase() === 'file processed and tasks saved.') {
           alert('✅ File uploaded and data saved successfully!');
+          this.taskForm.reset();
           this.fileUploadError = '';
           this.closeModal();
           this.getTasks();
         } else {
           alert('❌ Upload failed: ' + response);
           this.fileUploadError = response;
+          this.taskForm.reset();
           this.closeModal();
           this.getTasks();
         }
