@@ -35,20 +35,31 @@ export class AdminDashboardComponent implements OnInit {
   userCount:number=0;
   taskCount:number=0;
 
+//Pagination 
+currentPage: number = 1;
+pageSize: number = 5;
+get paginatedTasks() {
+  const start = (this.currentPage - 1) * this.pageSize;
+  return this.taskLists.slice(start, start + this.pageSize);
+}
+
+get totalPages(): number {
+  return Math.ceil(this.taskLists.length / this.pageSize);
+}
+
+
+//Ends here
 
   
   stats = [
     { title: 'Total Tasks', count: 0 },
-    { title: 'Completed Tasks', count: 80 },
-    { title: 'Pending Tasks', count: 40 },
-    { title: 'Total Users', count:0}
+    { title: 'Completed Tasks', count: 0 },
+    { title: 'Pending Tasks', count: 0 },
+    //{ title: 'Total Users', count:0}
+    {title: 'New Tasks', count:0}
   ];
 
-  taskList = [
-    { title: 'Design Homepage', status: 'In Progress', assignedTo: 'John', dueDate: new Date() },
-    { title: 'Database Backup', status: 'Completed', assignedTo: 'Alice', dueDate: new Date() },
-    { title: 'Bug Fixes', status: 'Pending', assignedTo: 'Mike', dueDate: new Date() }
-  ];
+
 
   
   
@@ -89,10 +100,10 @@ export class AdminDashboardComponent implements OnInit {
       next: (res) => {
         this.userList = res;
         this.userCount = res.length;
-        const totalUsersStat = this.stats.find(stat => stat.title === 'Total Users');
-        if (totalUsersStat) {
-          totalUsersStat.count = this.userCount;
-        }
+        // const totalUsersStat = this.stats.find(stat => stat.title === 'Total Users');
+        // if (totalUsersStat) {
+        //   totalUsersStat.count = this.userCount;
+        // }
       },
       error: (err) => {
         this.logger.error("Failed to load user list", err); 
@@ -117,11 +128,33 @@ export class AdminDashboardComponent implements OnInit {
  
 getTask(){
   this.taskService.getAllTasks().subscribe({next:(res)=>{this.taskLists=res;this.taskCount=res.length;
+  
   const totalTaskStat=this.stats.find(stat=>stat.title==='Total Tasks');
   if(totalTaskStat)
   {
    totalTaskStat.count=this.taskCount;
   }
+
+  const completedCount = res.filter(task => task.taskStatus === 'Completed').length;
+  const completedTaskStat = this.stats.find(stat => stat.title === 'Completed Tasks');
+  if (completedTaskStat) {
+    completedTaskStat.count = completedCount;
+  }
+
+  
+  const dueCount = res.filter(task => task.taskStatus === 'OnDue').length;
+  const dueTaskStat = this.stats.find(stat => stat.title === 'Pending Tasks');
+  if (dueTaskStat) {
+    dueTaskStat.count = dueCount;
+  }
+  
+  const newTask = res.filter(task => task.taskStatus === 'New').length;
+  const newTaskStat = this.stats.find(stat => stat.title === 'New Tasks');
+  if (newTaskStat) {
+    newTaskStat.count = newTask;
+  }
+  
+
   },
   error:(err)=>{
     this.logger.error("Failed to load task list",err);

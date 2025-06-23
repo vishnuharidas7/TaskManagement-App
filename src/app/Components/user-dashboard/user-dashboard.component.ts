@@ -27,6 +27,8 @@ private readonly JWT_TOKEN = 'JWT_TOKEN';
 private notificationSubscription?: Subscription;
 notificationDropdownVisible=false;
 
+
+//Task Filter
   tasks: Tasks[] = [];
   assignedTasksCount: number = 0;
   inProgressTasksCount: number = 0;
@@ -40,12 +42,59 @@ notificationDropdownVisible=false;
   taskForm : FormGroup = new FormGroup({});
   userFormSettings : FormGroup = new FormGroup({});
 
+  filters = {
+    date: '',
+    status: '',
+    priority: ''
+  };
+  
+  statuses: string[] = ['New', 'OnDue', 'Completed']; // customize as needed
+  priorities: string[] = ['Low', 'Medium', 'High']; // customize as needed
+  
+  allTasks: Tasks[] = []; // original data
+  filteredTasks: Tasks[] = [];
+  paginatedTasks: Tasks[] = [];
+  currentPage: number = 1;
+  pageSize: number = 10;
+  totalPages: number = 1;
+  
+  applyFilters(): void {
+    const { date, status, priority } = this.filters;
+  
+    this.filteredTasks = this.allTasks.filter(task => {
+      //const matchesName = name ? task.userName.toLowerCase().includes(name.toLowerCase()) : true;
+      const matchesDate = date ? new Date(task.dueDate).toDateString() === new Date(date).toDateString() : true;
+      const matchesStatus = status ? task.taskStatus === status : true;
+      const matchesPriority = priority ? task.priority === priority : true;
+  
+      return matchesDate && matchesStatus && matchesPriority;
+    });
+  
+    this.totalPages = Math.ceil(this.filteredTasks.length / this.pageSize);
+    this.currentPage = 1; // reset to first page
+    this.updatePaginatedTasks();
+  }
+  
+  updatePaginatedTasks(): void {
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedTasks = this.filteredTasks.slice(start, end);
+  }
+  
+  goToPage(page: number): void {
+    this.currentPage = page;
+    this.updatePaginatedTasks();
+  }
+
+  //Ends here
+
   constructor(private authService: UserAuthService, private fb:FormBuilder,private logger:LoggerServiceService,private errorHandler:ErrorHandler,private userService:UsersService) {}
 
   ngOnInit(): void {
     //this.loadUserTasks();
     this.setFormState();
     this.getTasks();
+    this.countTaskStatuses(); 
     this.setFormStateSettings();
 
     this.notificationSubscription=timer(10000).subscribe(()=>{this.loadNotification();this.notificationSubscription?.unsubscribe()})
@@ -102,6 +151,8 @@ notificationDropdownVisible=false;
 
   setFormState()
   {
+    const userId = this.getUserInfoFromToken()?.userId; 
+
     this.taskForm = this.fb.group({
       taskId: 0,
       taskName: ['',[Validators.required]],
@@ -109,15 +160,16 @@ notificationDropdownVisible=false;
       dueDate: ['',[Validators.required, this.noPastDateValidator]],
       taskDescription:['',Validators.required] ,
       priority:['',Validators.required],
-      userName: ['Ram'],
-      taskStatus: ['', Validators.required]
+      userName: [''],
+      taskStatus: ['', Validators.required],
+      createdBy: userId 
     }); 
   }
 
 
   countTaskStatuses(): void {
     this.assignedTasksCount = this.tasks.filter(t => t.taskStatus === 'New').length;
-    this.inProgressTasksCount = this.tasks.filter(t => t.taskStatus === 'InProgress').length;
+    this.inProgressTasksCount = this.tasks.filter(t => t.taskStatus === 'OnDue').length;
     this.completedTasksCount = this.tasks.filter(t => t.taskStatus === 'Completed').length;
   }
 
@@ -236,9 +288,14 @@ notificationDropdownVisible=false;
     }
 
     this.taskService.getUserTask(userInfo.userId).subscribe({
-      next: (res) => {
-        this.tasks = res;
-        this.countTaskStatuses();
+      // next: (res) => {
+      //   this.tasks = res;
+      //   this.countTaskStatuses();
+        next: (res) => {
+          this.tasks = res;
+          this.allTasks = res; // ✅ Needed for filtering
+          this.applyFilters();
+          this.countTaskStatuses();
       },
       error: (err) => {
         const message = 'Failed to load user tasks';
