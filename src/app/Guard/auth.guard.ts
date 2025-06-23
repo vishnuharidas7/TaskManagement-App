@@ -1,40 +1,84 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 import { UserAuthService } from '../Services/user-auth.service';
-import { of } from 'rxjs';
+import { of, defer } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import { routes } from '../app.routes';
 
-export const authGuard: CanActivateFn = (route, state) => {
-  let authService=inject(UserAuthService);
-  let routerservice=inject(Router);
+export function authGuard(allowedRoles:string[]): CanActivateFn 
+{
+  return(route:ActivatedRouteSnapshot)=>{  
+  const authService = inject(UserAuthService);
+  const router = inject(Router);
 
-  
-  if (!authService.isLoggedIn()) {
-    routerservice.navigate(['/login']);
-    return of(false);
-  }
-
+  return defer(() => {
+    if (!authService.isLoggedIn()) {
+      router.navigate(['/login']);
+      return of(false);
+    }
 
     if (authService.isTokenExpired()) {
-      //debugger
-      const refreshToken$ = authService.refreshToken();
-      //console.log('mss',refreshToken$);
-      if (!refreshToken$) {
-        routerservice.navigate(['/login']);
-        return of(false);
-      }
-  
-      return refreshToken$.pipe(
-        map(() => true), // Token refreshed successfully
+      return authService.refreshToken().pipe(
+        map(() => true),
         catchError(() => {
-          routerservice.navigate(['/login']);
+          router.navigate(['/login']);
           return of(false);
         })
       );
     }
-  
+
+    //checkrole
+    const userRole=sessionStorage.getItem('user_role')
+    if(!userRole||!allowedRoles.includes(userRole)){
+      router.navigate(['/login']);
+      return of(false)
+    }
+
     return of(true);
-  };
+  });
+};
+}
+
+
+
+
+// import { inject } from '@angular/core';
+// import { CanActivateFn, Router } from '@angular/router';
+// import { UserAuthService } from '../Services/user-auth.service';
+// import { of } from 'rxjs';
+// import { map, catchError } from 'rxjs/operators';
+
+// export const authGuard: CanActivateFn = (route, state) => {
+//   let authService=inject(UserAuthService);
+//   let routerservice=inject(Router);
+
+  
+//   if (!authService.isLoggedIn()) {
+//     routerservice.navigate(['/login']);
+//     return of(false);
+//   }
+
+
+//     if (authService.isTokenExpired()) {
+//       //debugger
+//       const refreshToken$ = authService.refreshToken();
+//       //console.log('mss',refreshToken$);
+//       if (!refreshToken$) {
+//         routerservice.navigate(['/login']);
+//         return of(false);
+//       }
+  
+//       return refreshToken$.pipe(
+//         map(() => true), // Token refreshed successfully
+//         catchError(() => {
+//           routerservice.navigate(['/login']);
+//           return of(false);
+//         })
+//       );
+//     }
+  
+//     return of(true);
+//   };
 
 // import { inject } from '@angular/core';
 // import { CanActivateFn, Router } from '@angular/router';

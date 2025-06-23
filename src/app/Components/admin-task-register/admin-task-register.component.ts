@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, NgModule, ViewChild, inject, viewChild } from '@angular/core';
+import { Component, ElementRef, NgModule, ViewChild, inject, viewChild,ErrorHandler } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { TasksService } from '../../Services/tasks.service';
 import { FormGroup, FormsModule,FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Tasks } from '../../Models/tasks';
+import { LoggerServiceService } from '../../Services/logger-service.service';
 
 interface User {
   id: number;
@@ -33,24 +34,69 @@ export class AdminTaskRegisterComponent {
   //fileUploadForm: FormGroup;
   selectedFile: File | null = null;
   fileUploadError: string = '';
+  private readonly JWT_TOKEN = 'JWT_TOKEN';
+
   
 
-  //hardcoded values
-  stats = [
-    { title: 'Total Tasks', count: 120 },
-    { title: 'Completed Tasks', count: 80 },
-    { title: 'Pending Tasks', count: 40 },
-    { title: 'Total Users', count: 25 }
-  ];
+// //Pagination 
+// currentPage: number = 1;
+// pageSize: number = 10;
+// get paginatedTasks() {
+//   const start = (this.currentPage - 1) * this.pageSize;
+//   return this.tasks.slice(start, start + this.pageSize);
+// }
 
-  taskList = [
-    { title: 'Design Homepage', status: 'In Progress', assignedTo: 'John', dueDate: new Date() },
-    { title: 'Database Backup', status: 'Completed', assignedTo: 'Alice', dueDate: new Date() },
-    { title: 'Bug Fixes', status: 'Pending', assignedTo: 'Mike', dueDate: new Date() }
-  ];
-  //ends here
+// get totalPages(): number {
+//   return Math.ceil(this.tasks.length / this.pageSize);
+// }
+// //Ends here
 
-  constructor(private fb:FormBuilder) {}
+filters = {
+  name: '',
+  date: '',
+  status: '',
+  priority: ''
+};
+
+statuses: string[] = ['New', 'OnDue', 'Completed']; // customize as needed
+priorities: string[] = ['Low', 'Medium', 'High']; // customize as needed
+
+allTasks: Tasks[] = []; // original data
+filteredTasks: Tasks[] = [];
+paginatedTasks: Tasks[] = [];
+currentPage: number = 1;
+pageSize: number = 10;
+totalPages: number = 1;
+
+applyFilters(): void {
+  const { name, date, status, priority } = this.filters;
+
+  this.filteredTasks = this.allTasks.filter(task => {
+    const matchesName = name ? task.userName.toLowerCase().includes(name.toLowerCase()) : true;
+    const matchesDate = date ? new Date(task.dueDate).toDateString() === new Date(date).toDateString() : true;
+    const matchesStatus = status ? task.taskStatus === status : true;
+    const matchesPriority = priority ? task.priority === priority : true;
+
+    return matchesName && matchesDate && matchesStatus && matchesPriority;
+  });
+
+  this.totalPages = Math.ceil(this.filteredTasks.length / this.pageSize);
+  this.currentPage = 1; // reset to first page
+  this.updatePaginatedTasks();
+}
+
+updatePaginatedTasks(): void {
+  const start = (this.currentPage - 1) * this.pageSize;
+  const end = start + this.pageSize;
+  this.paginatedTasks = this.filteredTasks.slice(start, end);
+}
+
+goToPage(page: number): void {
+  this.currentPage = page;
+  this.updatePaginatedTasks();
+}
+
+  constructor(private fb:FormBuilder,private logger:LoggerServiceService,private errorHandler:ErrorHandler) {}
 
   
   
@@ -60,6 +106,49 @@ export class AdminTaskRegisterComponent {
     this.getUsers();
     this.getTasks();
   }
+
+  // Addded to fetch created by userid
+
+  getUserIdFromToken(): {userId:number} | null {
+    const token = sessionStorage.getItem(this.JWT_TOKEN);
+    //const token = localStorage.getItem('token');  // or wherever you store it
+  
+    if (!token) return null;
+  
+    try {
+      // JWT format: header.payload.signature
+      const payloadBase64 = token.split('.')[1];
+      const payloadJson = atob(payloadBase64);
+      const payload = JSON.parse(payloadJson);
+  
+      // Extract the userId from the specific claim
+      const userIdString = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+      
+      if (!userIdString) return null;
+  
+      return{
+        userId:parseInt(userIdString,10)
+      }
+  
+    } catch (error) {
+      console.error('Error parsing JWT token:', error);
+      return null;
+    }
+  }
+
+  // getUserIdFromToken(): number {
+  //   const token = localStorage.getItem('access_token'); // Adjust based on where you store it
+  //   if (!token) return 0;
+  
+  //   try {
+  //     const payload = JSON.parse(atob(token.split('.')[1])); // Decode JWT
+  //     return payload.userId || 0; // Adjust based on token structure
+  //   } catch (e) {
+  //     console.error('Invalid token', e);
+  //     return 0;
+  //   }
+  // }
+  //Ends here
 
   openModal(){
     const createTask = document.getElementById('myModal');
@@ -94,28 +183,54 @@ export class AdminTaskRegisterComponent {
 
 
   getUsers(): void {
-    this.taskService.getAllUsers().subscribe((res) => {
-      this.users = res;
-    })
+    this.taskService.getAllUsers().subscribe({
+      next: (res) => {
+        this.users = res;
+      },
+      error: (err) => {
+        this.logger.error("Failed to fetch users", err);         
+        this.errorHandler.handleError(err);                     
+        alert("Unable to load users. Please try again later."); 
+      }
+    });
   }
 
   getTasks() {
-  this.taskService.getAllTasks().subscribe((res) => {
-    this.tasks = res;
-  })
-}
+    // this.taskService.getAllTasks().subscribe({
+    //   next: (res) => {
+    //     this.tasks = res;
+    this.taskService.getAllTasks().subscribe({
+      next: (res) => {
+        this.tasks = res;
+        this.allTasks = res; // ✅ Needed for filtering
+        this.applyFilters();
+      },
+      error: (err) => {
+        this.logger.error("Failed to fetch tasks", err);         
+        this.errorHandler.handleError(err);                     
+        alert("Unable to load tasks. Please try again later.");  
+      }
+    });
+  }
+  
 
-onDelete(id : number)
-  {
-    const isconfirm = confirm("Are you sure you want to delete this Task?");
-    if(isconfirm)
-    {
-      this.taskService.deleteTask(id).subscribe((res) => {
-        alert("Task deleted successfully....");
-        this.getTasks();
+  onDelete(id: number) {
+    const isConfirm = confirm("Are you sure you want to delete this Task?");
+    if (isConfirm) {
+      this.taskService.deleteTask(id).subscribe({
+        next: (res) => {
+          alert("Task deleted successfully.");
+          this.getTasks(); 
+        },
+        error: (err) => {
+          this.logger.error("Failed to delete task", err);        
+          this.errorHandler.handleError(err);                     
+          alert("Failed to delete the task. Please try again later."); 
+        }
       });
     }
   }
+  
 
   toDateInputFormat(date: any): string {
     return new Date(date).toISOString().split('T')[0];
@@ -142,6 +257,9 @@ get fileuploadControl()
 
   setFormState()
   {
+
+    const createdbyID = this.getUserIdFromToken();
+
     this.taskForm = this.fb.group({
       taskId: 0,
       taskName: ['',[Validators.required]],
@@ -150,7 +268,8 @@ get fileuploadControl()
       taskDescription:['',Validators.required] ,
       priority:['',Validators.required],
       userName: ['Ram'],
-      taskStatus:['']   
+      taskStatus:[''],
+      createdBy:createdbyID?.userId 
     });
 
     this.fileUploadForm = this.fb.group({
@@ -178,7 +297,12 @@ get fileuploadControl()
           this.taskForm.reset();
           this.closeModal();
           this.getTasks();
-        }});
+        }, error: (err) => {
+          this.logger.error("Failed to add task", err);
+          this.errorHandler.handleError(err);
+          alert("Failed to add task. Please try again.");
+        }
+      });
       }
      else{
       this.taskService.updateTask(this.formValue).subscribe({
@@ -188,7 +312,13 @@ get fileuploadControl()
           this.taskForm.reset();
           this.closeModal();
           this.getTasks();
-        }});
+        },
+        error: (err) => {
+          this.logger.error("Failed to update task", err);
+          this.errorHandler.handleError(err);
+          alert("Failed to update task. Please try again.");
+        }
+      });
      } 
   }
 
@@ -238,12 +368,15 @@ onFileUpload() {
         }
       },
       error: (err) => {
+        this.logger.error('❌ File upload error', err);
+        this.errorHandler.handleError(err);
         alert('❌ File upload failed. Please try again.');
         this.fileUploadError = 'File upload failed. Please try again.';
       }
     });
   } else {
     alert('⚠️ Please select a file before uploading.');
+    this.logger.warn('File upload attempted without selecting a file');
     this.fileUploadError = 'Please select a file before uploading.';
   }
 }

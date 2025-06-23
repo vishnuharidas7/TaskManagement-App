@@ -7,4 +7,5 @@ export interface Tasks {
     taskStatus:string,
     dueDate:Date,
     priority:string,
+    createdBy:number
 }

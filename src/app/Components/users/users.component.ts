@@ -1,10 +1,11 @@
-import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject ,ErrorHandler} from '@angular/core';
 import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Users } from '../../Models/users';
 import { UsersService } from '../../Services/users.service';
 import { CommonModule } from '@angular/common';
 import { debounceTime, first, map, switchMap } from 'rxjs';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import { LoggerServiceService } from '../../Services/logger-service.service';
 
 @Component({
   selector: 'app-users',
@@ -34,7 +35,7 @@ userService = inject(UsersService);
 
 userForm : FormGroup = new FormGroup({});
 
-constructor(private fb: FormBuilder){}
+constructor(private fb: FormBuilder,private logger:LoggerServiceService,private errorHandler:ErrorHandler){}
 
 ngOnInit(): void {
   this.setFormState();
@@ -120,6 +121,8 @@ get userNameControl()
         error: (error) => {
           console.log('Error status:', error.status);
           console.log('Error response:', error.error);
+          console.error("User added faild:", error);
+          this.logger.error("User added faild:", error)
           if (error.status === 400 && error.error?.error === "Email already exists.") {
             const emailCtrl = this.emailControl;
             if(emailCtrl){
@@ -130,12 +133,21 @@ get userNameControl()
       });
     }
     else{
-         this.userService.updateUser(this.formValue).subscribe((res) => {
-        alert('User Updated Successfully....');
-        this.getUser();
-        this.userForm.reset();
-        this.closeModal();
-      })
+      this.userService.updateUser(this.formValue).subscribe({
+        next: (res) => {
+          alert('User Updated Successfully....');
+          this.logger.info('User updated successfully');
+          this.getUser();
+          this.userForm.reset();
+          this.closeModal();
+        },
+        error: (err) => {
+          console.error('Failed to update user', err);
+          this.logger.error('Failed to update user', err);
+          this.errorHandler.handleError(err);
+          alert('Failed to update user. Please try again later.');
+        }
+      });
     }
   }
 
@@ -150,14 +162,21 @@ get userNameControl()
       });
   }
 
-  onDelete(id : number)
-  {
-    const isconfirm = confirm("Are you sure you want to delete this User?");
-    if(isconfirm)
-    {
-      this.userService.deleteUser(id).subscribe((res) => {
-        alert("User deleted successfully....");
-        this.getUser();
+  onDelete(id: number) {
+    const isConfirm = confirm("Are you sure you want to delete this User?");
+    if (isConfirm) {
+      this.userService.deleteUser(id).subscribe({
+        next: () => {
+          alert("User deleted successfully.");
+          this.logger.info(`User with ID ${id} deleted.`);
+          this.getUser();
+        },
+        error: (err) => {
+          console.error("Failed to delete user", err);
+          this.logger.error("Failed to delete user", err);
+          this.errorHandler.handleError(err);
+          alert("Failed to delete user. Please try again later.");
+        }
       });
     }
   }

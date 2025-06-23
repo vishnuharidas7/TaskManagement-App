@@ -6,6 +6,7 @@ import { AuthUsersComponent } from './Components/auth-users/auth-users.component
 import { authGuard } from './Guard/auth.guard';
 import { UserDashboardComponent } from './Components/user-dashboard/user-dashboard.component';
 
+
 export const routes: Routes = [
 
     {
@@ -13,21 +14,21 @@ export const routes: Routes = [
     
     },
     {
-        //path: "", redirectTo: 'adminDashboard', pathMatch: 'full',canActivate:[authGuard]
-        path: '',component: AdminDashboardComponent,canActivate:[authGuard]
+        path: '',redirectTo: 'login', pathMatch: 'full'
     },
     {
-        path: "users", component:UsersComponent
+        path: 'users', component:UsersComponent,  canActivate: [authGuard]
     },
     { 
-        path: 'adminDashboard', component: AdminDashboardComponent
+        path: 'adminDashboard', component: AdminDashboardComponent,  canActivate: [authGuard(['Admin'])]
     },
     {
-        path: 'userDashboard', component: UserDashboardComponent
+        path: 'userDashboard', component: UserDashboardComponent,  canActivate: [authGuard(['User'])]
     },
     {
-        path: 'adminTask', component: AdminTaskRegisterComponent
+        path: 'adminTask', component: AdminTaskRegisterComponent,  canActivate: [authGuard]
     }
+
 
 ];
 
