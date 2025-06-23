@@ -17,6 +17,8 @@ export class UsersService {
 
   private checkUserNameExists ='https://localhost:7192/api/Users/check-username?username=';
 
+  private getUserById='https://localhost:7192/api/Users/viewusersByid';
+
   constructor() { }
 
   http = inject(HttpClient)
@@ -37,12 +39,20 @@ export class UsersService {
 
   updateUser(users: Users)
   {
+    debugger
     return this.http.put(`${this.updateUserApiUrl }/${users.id}`, users);
   }
 
   deleteUser(id : number)
   {
     return this.http.delete(`${this.deleteUserApiUrl}/${id}`);
+  }
+  
+  getUserbyId(id:number)
+  {
+    //debugger
+    return this.http.get<Users>(`${this.getUserById}/${id}`);
+
   }
 
 }
