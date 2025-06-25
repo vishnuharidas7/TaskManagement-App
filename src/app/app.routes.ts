@@ -5,6 +5,7 @@ import { AdminTaskRegisterComponent } from './Components/admin-task-register/adm
 import { AuthUsersComponent } from './Components/auth-users/auth-users.component';
 import { authGuard } from './Guard/auth.guard';
 import { UserDashboardComponent } from './Components/user-dashboard/user-dashboard.component';
+import { ForgotPasswordComponent } from './Components/forgot-password/forgot-password.component';
 
 
 export const routes: Routes = [
@@ -27,6 +28,9 @@ export const routes: Routes = [
     },
     {
         path: 'adminTask', component: AdminTaskRegisterComponent,  canActivate: [authGuard]
+    },
+    {
+        path: 'forgotpassword', component:ForgotPasswordComponent
     }
 
 

@@ -24,6 +24,8 @@ export class UserAuthService {
   private refreshTokenTimer?: ReturnType<typeof setTimeout>;
   constructor(private http: HttpClient, private router: Router) {}
 
+  private baseUrl = 'https://localhost:7192/api/Auth/forgot-password'; // Added for forgot password
+
   login(credentials: { UserName: string; Password: string }): Observable<any> {
     return this.http
       //.post('https://localhost:7268/api/Auth/login', credentials)
@@ -34,6 +36,12 @@ export class UserAuthService {
         )
       );
   }
+
+  //Added for sending forgoat password email
+  sendForgotPasswordEmail(email: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/forgot-password`, { email }, { responseType: 'json' });
+  }
+ //Ends here
  
   private doLoginUser(username: string, tokensFromBE: any): void {
 
