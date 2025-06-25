@@ -1,13 +1,13 @@
 import { Component,ErrorHandler } from '@angular/core';
 import { UserAuthService } from '../../Services/user-auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LoggerServiceService } from '../../Services/logger-service.service';
 
 
 @Component({
   selector: 'app-auth-users',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './auth-users.component.html',
   styleUrl: './auth-users.component.css'
 })

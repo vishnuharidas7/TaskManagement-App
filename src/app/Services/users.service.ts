@@ -42,7 +42,6 @@ export class UsersService {
 
   updateUser(users: Users)
   {
-    debugger
     return this.http.put(`${this.updateUserApiUrl }/${users.id}`, users);
   }
 
