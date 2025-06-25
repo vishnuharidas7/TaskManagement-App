@@ -39,7 +39,7 @@ export class UserAuthService {
 
   //Added for sending forgoat password email
   sendForgotPasswordEmail(email: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/forgot-password`, { email }, { responseType: 'json' });
+    return this.http.post(`${this.baseUrl}`, { email }, { responseType: 'json' });
   }
  //Ends here
  
