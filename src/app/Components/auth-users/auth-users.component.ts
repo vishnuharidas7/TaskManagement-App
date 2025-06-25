@@ -44,15 +44,19 @@ export class AuthUsersComponent {
         }
       },
       error: (err) => {
+        debugger
         console.error("Login Failed:", err);
         this.logger.error("Login failed", err)
-        if (err.error?.message) {
-          alert("Login Failed: " + err.error.message);
-          this.errorHandler.handleError(err);
-        } else {
-          alert("Login Failed. Please check your credentials.");
-          this.errorHandler.handleError(err);
-        }
+        const errorMessage =
+        err.error?.message === "An unexpected error occurred. Please try again later."
+          ? err.error?.detail
+          : err.error?.message;
+    
+      if (errorMessage) {
+        alert("Login Failed: " + errorMessage);
+      } else {
+        alert("Login Failed.An unexpected error occurred");
+      }
       }
     });
   }

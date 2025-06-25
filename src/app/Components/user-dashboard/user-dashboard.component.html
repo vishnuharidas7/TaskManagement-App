@@ -417,9 +417,9 @@
                     style="font-size: 11px; margin-left: 10px;">This email is already registered.
                 </div>
             </div>
-            <div class="col-6">
+            <!-- <div class="col-6">
                 <input type="password" formControlName="password" name="password" class="form-control" placeholder="Password">
-            </div>
+            </div> -->
          </div>
          <div class="row mt-3">
             <div class="col-6">
@@ -460,7 +460,7 @@
         <div class="modal-footer">
            
             <button type="submit"  class="btn btn-success" data-bs-dismiss="modal" (click)="updateUser()">Update</button>
-        
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="openPassswordModel()">Update Password</button>
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="closeGotoSettingModal()">Close</button>
         </div>
         </form>
@@ -468,6 +468,46 @@
     </div>
   </div>
 
+  <!-- update password -->
+
+<div class="modal" id="passwordModal" #passwordModal>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: #a2b0c5;">
+              <h5 class="modal-title">Update Password</h5>
+        </div>
+      <form [formGroup]="pswdForm">
+      <!-- Modal body -->
+      <div class="modal-body">
+          <div class="row mt-3">
+              <div class="col-12">
+                  <input type="text" formControlName="curpswd" name="curpswd" class="form-control" placeholder="Current password">
+              </div>
+          </div>  
+            <div class="row mt-3">  
+              <div class="col-12">
+                <input type="text" formControlName="newpswd" name="newpswd" class="form-control" placeholder="New Password">
+              </div>
+            </div>  
+            <div class="row mt-3">
+              <div class="col-12">
+               <input type="text" formControlName="confrmNewpswd" name="confrmNewpswd" class="form-control" placeholder="Confirm New Password">
+              <div class="text-danger mt-1" *ngif="pswdForm.errors?.passwordMismatch && pswdForm.touched ">Password do not match</div>
+              </div>
+            </div>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+         
+          <button type="submit" class="btn btn-success" data-bs-dismiss="modal" (click)="updatePassword()">Update</button>
+      
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="closePswdModel()">Close</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 
   
