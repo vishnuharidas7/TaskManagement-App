@@ -1,44 +1,35 @@
 import { Component, ElementRef, OnInit, ViewChild, inject ,ErrorHandler} from '@angular/core';
-import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ReactiveFormsModule, Validators,ValidatorFn  } from '@angular/forms';
 import { Users } from '../../Models/users';
 import { UsersService } from '../../Services/users.service';
 import { CommonModule } from '@angular/common';
-import { debounceTime, first, map, switchMap } from 'rxjs';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { combineLatest, debounceTime, first, map, switchMap,of } from 'rxjs';
+import { RouterLink} from '@angular/router';
 import { LoggerServiceService } from '../../Services/logger-service.service';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterOutlet, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule,RouterLink],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css'
 })
 export class UsersComponent implements OnInit {
 @ViewChild('myModal') model : ElementRef | undefined;
-
-
-UsernameExistsValidator(): AsyncValidatorFn {
-  return (control: AbstractControl) => {
-    return control.valueChanges.pipe(
-      debounceTime(300),
-      switchMap(username => this.userService.checkUsernameExists(username)),
-      map(exists => (exists ? { usernameTaken: true } : null)),
-      first()
-    );
-  };
-}
-
+@ViewChild('passwordModal') passwordModal : ElementRef | undefined;
 
 userList: Users[] = [];
 userService = inject(UsersService);
-
+orginalUserName:string='';
 userForm : FormGroup = new FormGroup({});
-
+pswdForm: FormGroup = new FormGroup({});
+private readonly JWT_TOKEN = 'JWT_TOKEN';
 constructor(private fb: FormBuilder,private logger:LoggerServiceService,private errorHandler:ErrorHandler){}
+formValue: any;
 
 ngOnInit(): void {
   this.setFormState();
+  this.setPswdFormState();
   this.getUser();
 }
 
@@ -69,6 +60,35 @@ getUser()
   })
 }
 
+// getUserInformationFromToken(): {userId:number,role:string} | null {
+//   const token = sessionStorage.getItem(this.JWT_TOKEN);
+//   //const token = localStorage.getItem('token');  // or wherever you store it
+
+//   if (!token) return null;
+
+//   try {
+//     // JWT format: header.payload.signature
+//     const payloadBase64 = token.split('.')[1];
+//     const payloadJson = atob(payloadBase64);
+//     const payload = JSON.parse(payloadJson);
+
+//     // Extract the userId from the specific claim
+//     const userIdString = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+//     const roleString = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+    
+//     if (!userIdString || !roleString) return null;
+
+//     return{
+//       userId:parseInt(userIdString,10),
+//       role:roleString
+//     }
+
+//   } catch (error) {
+//     console.error('Error parsing JWT token:', error);
+//     return null;
+//   }
+// }
+
 get userNameControl()
 {
   return this.userForm.get('userName');
@@ -92,14 +112,28 @@ get userNameControl()
         // Validators.pattern('^[a-zA-Z0-9._%+-]+@example\\.com$')
         Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$') 
         ]],
-      password: ['',[Validators.required]],
+      //password: ['',[Validators.required]],
       roleid: ['',[Validators.required]],
       phoneNumber: ['',[Validators.required, Validators.maxLength(10), Validators.minLength(10),Validators.pattern(/^[0-9]{10}$/)]],
       gender: ['',Validators.required]
     });
   }
 
-  formValue: any;
+  UsernameExistsValidator(): AsyncValidatorFn {
+    return (control: AbstractControl) => {
+      if(control.value===this.orginalUserName){
+        return of(null);
+      }
+      return control.valueChanges.pipe(
+        debounceTime(300),
+        switchMap(username => this.userService.checkUsernameExists(username)),
+        map(exists => (exists ? { usernameTaken: true } : null)),
+        first()
+      );
+    };
+  }
+
+  
   onSubmit(){
     console.log(this.userForm.value);
     if(this.userForm.invalid)
@@ -152,8 +186,9 @@ get userNameControl()
   }
 
   onEdit(user:Users)
-  {
+  { //debugger
     this.openModal();
+    this.orginalUserName=user.userName;
     this.userForm.patchValue(
       //User
       {
@@ -179,6 +214,67 @@ get userNameControl()
         }
       });
     }
+  }
+
+  openPassswordModel(user:Users)
+  {
+    this.pswdForm.patchValue({id:user.id})
+    const pswdModel = document.getElementById('passwordModal');
+    if(pswdModel != null)
+    {
+      pswdModel.style.display = 'block';
+    }
+  }
+  closePswdModel(){
+   // this.setFormState();
+    if(this.passwordModal != null)
+    {
+      this.passwordModal.nativeElement.style.display = 'none';
+    }
+  }
+
+  passwordsMatchValidator(): ValidatorFn {
+    return (group: AbstractControl): {[key: string]: any} | null => {
+      const newPassword = group.get('newpswd')?.value;
+      const confirmPassword = group.get('confrmNewpswd')?.value;
+      return newPassword === confirmPassword ? null : { passwordMismatch: true };
+    };
+  }
+
+  setPswdFormState()
+  {
+    this.pswdForm = this.fb.group({
+      id: 0,
+      curpswd: ['',[Validators.required]],
+      newpswd: ['',[Validators.required]],
+      confrmNewpswd: ['',[Validators.required]]
+
+    },{Validators:this.passwordsMatchValidator()} );
+  }
+
+
+  updatePassword(){
+    if(this.pswdForm.invalid){
+      alert('Please fill in all fields and ensure passwords match.')
+      return;
+    }
+     this.formValue=this.pswdForm.value;
+
+    this.userService.updatepassword(this.formValue).subscribe({
+      next:()=>{
+        alert('Password updated successfully');
+        this.pswdForm.reset();
+        this.closePswdModel();
+      },
+      error:(err)=>{
+        console.error('Failed to update user', err);
+        this.logger.error('Failed to update user', err);
+        this.errorHandler.handleError(err);
+        alert('Failed to update user. Please try again later.');
+      }
+    });
+
+
   }
 
 }
