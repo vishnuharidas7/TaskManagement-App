@@ -3,7 +3,7 @@
       <h2>User Dashboard</h2>
       <div>
         <button class="btn btn-primary me-2" (click)="openModal()"> Add Task</button>
-        <button class="btn btn-outline-secondary me-2" (click)="goToSettingsOpenModal()">Settings</button>
+        <button class="btn btn-outline-secondary me-2" [routerLink]="['/usersettings']">Settings</button>
         <button class="btn btn-outline-danger" (click)="logout()">Logout</button>
 
          <!-- Notification Bell Icon -->
@@ -460,7 +460,7 @@
         <div class="modal-footer">
            
             <button type="submit"  class="btn btn-success" data-bs-dismiss="modal" (click)="updateUser()">Update</button>
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="openPassswordModel()">Update Password</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="openPassswordModel()">Change Password</button>
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="closeGotoSettingModal()">Close</button>
         </div>
         </form>

@@ -5,7 +5,7 @@
       <ul class="nav flex-column">
         <li class="nav-item"><a class="nav-link text-white" routerLink="/adminDashboard">Dashboard</a></li>
         <li class="nav-item"><a class="nav-link text-white" routerLink="/adminTask">Tasks</a></li>
-        <li class="nav-item"><a class="nav-link text-white" routerLink="/settings">Settings</a></li>
+        <li class="nav-item"><a class="nav-link text-white" routerLink="/adminsettings">Settings</a></li>
       </ul>
     </div>
   
@@ -115,11 +115,11 @@
                     style="font-size: 11px; margin-left: 10px;">This email is already registered.
                 </div>
             </div>
-            @if(userForm.value.id == 0){
+            <!-- @if(userForm.value.id == 0){
             <div class="col-6">
                 <input type="password" formControlName="password" name="password" class="form-control" placeholder="Password">
             </div>
-          }
+          } -->
          </div>
          <div class="row mt-3">
             <div class="col-6">
@@ -164,8 +164,10 @@
         @else{
             <button type="submit" [disabled]="this.userForm.invalid" class="btn btn-success" data-bs-dismiss="modal">Update</button>
         }
+        <!-- @if(userForm.value.id!=0){
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="openPassswordModel(userForm.value)">Update Password</button>
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="closeModal()">Close</button>
+      }   -->
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="closeModal()">Close</button>
         </div>
         </form>
       </div>

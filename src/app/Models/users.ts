@@ -7,6 +7,6 @@ export interface Users {
     status:boolean,
     name:string,
     phoneNumber:string,
-    gender:string
+    gender:string,
     password:string
 }

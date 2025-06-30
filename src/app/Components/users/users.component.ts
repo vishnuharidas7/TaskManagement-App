@@ -3,7 +3,7 @@ import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ReactiveForm
 import { Users } from '../../Models/users';
 import { UsersService } from '../../Services/users.service';
 import { CommonModule } from '@angular/common';
-import { debounceTime, first, map, switchMap } from 'rxjs';
+import { combineLatest, debounceTime, first, map, switchMap,of } from 'rxjs';
 import { RouterLink} from '@angular/router';
 import { LoggerServiceService } from '../../Services/logger-service.service';
 
@@ -18,22 +18,9 @@ export class UsersComponent implements OnInit {
 @ViewChild('myModal') model : ElementRef | undefined;
 @ViewChild('passwordModal') passwordModal : ElementRef | undefined;
 
-
-UsernameExistsValidator(): AsyncValidatorFn {
-  return (control: AbstractControl) => {
-    return control.valueChanges.pipe(
-      debounceTime(300),
-      switchMap(username => this.userService.checkUsernameExists(username)),
-      map(exists => (exists ? { usernameTaken: true } : null)),
-      first()
-    );
-  };
-}
-
-
 userList: Users[] = [];
 userService = inject(UsersService);
-
+orginalUserName:string='';
 userForm : FormGroup = new FormGroup({});
 pswdForm: FormGroup = new FormGroup({});
 private readonly JWT_TOKEN = 'JWT_TOKEN';
@@ -132,6 +119,20 @@ get userNameControl()
     });
   }
 
+  UsernameExistsValidator(): AsyncValidatorFn {
+    return (control: AbstractControl) => {
+      if(control.value===this.orginalUserName){
+        return of(null);
+      }
+      return control.valueChanges.pipe(
+        debounceTime(300),
+        switchMap(username => this.userService.checkUsernameExists(username)),
+        map(exists => (exists ? { usernameTaken: true } : null)),
+        first()
+      );
+    };
+  }
+
   
   onSubmit(){
     console.log(this.userForm.value);
@@ -185,8 +186,9 @@ get userNameControl()
   }
 
   onEdit(user:Users)
-  { debugger
+  { //debugger
     this.openModal();
+    this.orginalUserName=user.userName;
     this.userForm.patchValue(
       //User
       {

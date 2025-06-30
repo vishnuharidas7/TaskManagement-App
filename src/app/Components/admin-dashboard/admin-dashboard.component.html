@@ -6,7 +6,7 @@
       <li class="nav-item"><a class="nav-link text-white" routerLink="/adminDashboard">Dashboard</a></li>
       <li class="nav-item"><a class="nav-link text-white" routerLink="/adminTask">Tasks</a></li>
       <li class="nav-item"><a class="nav-link text-white" routerLink="/users" routerLinkActive="active">Users</a></li>
-      <li class="nav-item"><a class="nav-link text-white" (click)="goToSettingsOpenModal()">Settings</a></li>
+      <li class="nav-item"><a class="nav-link text-white" routerLink="/adminsettings">Settings</a></li>
     </ul>
   </div>
 
@@ -188,7 +188,7 @@
         <div class="modal-footer">
            
             <button type="submit"  class="btn btn-success" data-bs-dismiss="modal" (click)="updateUser()">Update</button>
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="openPassswordModel()">Update Password</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="openPassswordModel()">Change Password</button>
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="closeGotoSettingModal()">Close</button>
         </div>
         </form>

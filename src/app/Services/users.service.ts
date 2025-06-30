@@ -37,6 +37,7 @@ export class UsersService {
 
   addUser(data : any)
   {
+    debugger
     return this.http.post(this.addUserApiUrl, data);
   }
 

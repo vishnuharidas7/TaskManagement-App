@@ -1,0 +1,141 @@
+#wrapper {
+    display: flex;
+    height: 100vh;
+  }
+  
+  #sidebar {
+    width: 240px;
+    height: 100vh;
+    /* position: fixed; */
+    position: fixed;
+    background-color: #3B4252;
+    color: white; 
+  }
+  
+  #page-content-wrapper {
+    margin-left: 240px;
+    overflow-x: hidden;
+  }
+
+  .active {
+    font-weight: bold;
+    color: #ffc107 !important;
+  }
+
+  .nav-link.active {
+    background-color: #007bff; /* Change the background color or other styles for active link */
+    color: white;
+  }
+
+  li{
+   color: white;
+   cursor: pointer;  
+  }
+
+  li:hover{
+    background-color: rgb(200, 158, 145);
+  }
+
+  .notification-bell {
+    position: relative;
+    cursor: pointer;
+    display: inline-block; 
+  }
+
+  .notification-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .notification-count {
+    background-color: red;
+  color: white;
+  border-radius: 50%;
+  font-size: 12px;
+  padding: 2px 6px;
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  }
+  
+  .notification-dropdown {
+    position: absolute;
+    top: 120%; /* Adjust depending on your bell size */
+    right: 0;
+    width: 300px;
+    z-index: 1000;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+
+  .admin-settings-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .notification-dropdown {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ddd;
+    width: 250px;
+    padding: 10px;
+    top: 50px;
+    right: 10px;
+    z-index: 10;
+  }
+  
+  .notification-bell {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .logout-btn {
+    padding: 5px 10px;
+    background-color: #c0392b;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  input, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+  }
+  
+  button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #3498db;
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+  
+  small {
+    color: red;
+  }
+  

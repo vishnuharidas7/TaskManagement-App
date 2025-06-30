@@ -172,34 +172,34 @@ getTask(){
     this.authService.logout();
   }
 
-  getUserInformationFromToken(): {userId:number,role:string} | null {
-    const token = sessionStorage.getItem(this.JWT_TOKEN);
-    //const token = localStorage.getItem('token');  // or wherever you store it
+  // getUserInformationFromToken(): {userId:number,role:string} | null {
+  //   const token = sessionStorage.getItem(this.JWT_TOKEN);
+  //   //const token = localStorage.getItem('token');  // or wherever you store it
   
-    if (!token) return null;
+  //   if (!token) return null;
   
-    try {
-      // JWT format: header.payload.signature
-      const payloadBase64 = token.split('.')[1];
-      const payloadJson = atob(payloadBase64);
-      const payload = JSON.parse(payloadJson);
+  //   try {
+  //     // JWT format: header.payload.signature
+  //     const payloadBase64 = token.split('.')[1];
+  //     const payloadJson = atob(payloadBase64);
+  //     const payload = JSON.parse(payloadJson);
   
-      // Extract the userId from the specific claim
-      const userIdString = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
-      const roleString = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+  //     // Extract the userId from the specific claim
+  //     const userIdString = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+  //     const roleString = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
       
-      if (!userIdString || !roleString) return null;
+  //     if (!userIdString || !roleString) return null;
   
-      return{
-        userId:parseInt(userIdString,10),
-        role:roleString
-      }
+  //     return{
+  //       userId:parseInt(userIdString,10),
+  //       role:roleString
+  //     }
   
-    } catch (error) {
-      console.error('Error parsing JWT token:', error);
-      return null;
-    }
-  }
+  //   } catch (error) {
+  //     console.error('Error parsing JWT token:', error);
+  //     return null;
+  //   }
+  // }
 
   loadNotification(){
     this.taskService.getTaskNotificationAdmin().subscribe({
@@ -258,7 +258,7 @@ getTask(){
         // Validators.pattern('^[a-zA-Z0-9._%+-]+@example\\.com$')
         Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$') 
         ]],
-      //password: ['',[Validators.required]],
+      password: ['',[Validators.required]],
       roleid: this.getUserInfoFromToken()?.roleId,
       phoneNumber: ['',[Validators.required, Validators.maxLength(10), Validators.minLength(10),Validators.pattern(/^[0-9]{10}$/)]],
       gender: ['',Validators.required]
@@ -278,7 +278,7 @@ getTask(){
   
     this.userService.getUserbyId(userInfo.userId).subscribe({
       next: (data) => {
-        debugger
+       // debugger
         this.userByid=data;
         this.orginalUserName=this.userByid.userName;
         this.userFormSettings.patchValue({
@@ -329,7 +329,7 @@ getTask(){
   }
 
   updateUser(){
-    debugger
+    //debugger
     console.log(this.userFormSettings.value);
     if(this.userFormSettings.invalid)
     {
@@ -409,7 +409,7 @@ getTask(){
    setPswdFormState()
   {
     this.pswdForm = this.fb.group({
-      id: this.getUserInformationFromToken()?.userId,
+      id: this.getUserInfoFromToken()?.userId,
       curpswd: ['',[Validators.required]],
       newpswd: ['',[Validators.required]],
       confrmNewpswd: ['',[Validators.required]]

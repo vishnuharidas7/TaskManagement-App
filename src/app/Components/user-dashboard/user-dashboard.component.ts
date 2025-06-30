@@ -12,10 +12,11 @@ import { timer } from 'rxjs';
 import { UsersService } from '../../Services/users.service';
 import { Users } from '../../Models/users';
 import { debounceTime, first, map, switchMap,of } from 'rxjs';
+import { RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-user-dashboard',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule,RouterLink],
   templateUrl: './user-dashboard.component.html',
   styleUrl: './user-dashboard.component.css'
 })
