@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Users } from '../Models/users';
+import { UpdatePswd } from '../Models/updatePswd';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,8 @@ export class UsersService {
 
   private getUserById='https://localhost:7192/api/Users/viewusersByid';
 
+  private updatePasswordApiUrl='https://localhost:7192/api/Users/updatePswd';
+
   constructor() { }
 
   http = inject(HttpClient)
@@ -34,6 +37,7 @@ export class UsersService {
 
   addUser(data : any)
   {
+    debugger
     return this.http.post(this.addUserApiUrl, data);
   }
 
@@ -52,6 +56,10 @@ export class UsersService {
     //debugger
     return this.http.get<Users>(`${this.getUserById}/${id}`);
 
+  }
+  updatepassword(pswdUpdate : UpdatePswd){
+    debugger
+    return this.http.put(`${this.updatePasswordApiUrl}/${pswdUpdate.id}`,pswdUpdate);
   }
 
 }

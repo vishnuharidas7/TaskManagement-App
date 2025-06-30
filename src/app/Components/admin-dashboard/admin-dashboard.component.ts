@@ -10,8 +10,8 @@ import { LoggerServiceService } from '../../Services/logger-service.service';
 import { interval,Subscription } from 'rxjs';
 import { timer } from 'rxjs';
 import { NotificationTask } from '../../Models/notificationTask';
-import { AbstractControl, FormsModule,ReactiveFormsModule, FormBuilder, FormGroup, ValidationErrors, Validators,AsyncValidatorFn } from '@angular/forms';
-import { debounceTime, first, map, switchMap } from 'rxjs';
+import { AbstractControl, FormsModule,ReactiveFormsModule, FormBuilder, FormGroup, ValidationErrors, Validators,AsyncValidatorFn,ValidatorFn } from '@angular/forms';
+import { debounceTime, first, map, switchMap,of } from 'rxjs';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -21,14 +21,17 @@ import { debounceTime, first, map, switchMap } from 'rxjs';
 })
 export class AdminDashboardComponent implements OnInit {
   @ViewChild('settingsModel') settingModel : ElementRef | undefined;
+  @ViewChild('passwordModal') passwordModal : ElementRef | undefined;
 
   private notificationSubscription?: Subscription;
   notificationDropdownVisible=false;
   notifications:NotificationTask[]=[];
   private readonly JWT_TOKEN = 'JWT_TOKEN';
   userFormSettings : FormGroup = new FormGroup({});
+  pswdForm: FormGroup = new FormGroup({});
   userByid:Users|null=null;
   formValue: any;
+  orginalUserName:string='';
 
   userList:Users[]=[];
   taskLists:Tasks[]=[];
@@ -71,6 +74,7 @@ get totalPages(): number {
     this.getUser();
     this.getTask();
     this.setFormStateSettings();
+    this.setPswdFormState();
 
     this.notificationSubscription=timer(5000).subscribe(()=>{this.loadNotification();this.notificationSubscription?.unsubscribe()})
   }
@@ -168,34 +172,34 @@ getTask(){
     this.authService.logout();
   }
 
-  getUserInformationFromToken(): {userId:number,role:string} | null {
-    const token = sessionStorage.getItem(this.JWT_TOKEN);
-    //const token = localStorage.getItem('token');  // or wherever you store it
+  // getUserInformationFromToken(): {userId:number,role:string} | null {
+  //   const token = sessionStorage.getItem(this.JWT_TOKEN);
+  //   //const token = localStorage.getItem('token');  // or wherever you store it
   
-    if (!token) return null;
+  //   if (!token) return null;
   
-    try {
-      // JWT format: header.payload.signature
-      const payloadBase64 = token.split('.')[1];
-      const payloadJson = atob(payloadBase64);
-      const payload = JSON.parse(payloadJson);
+  //   try {
+  //     // JWT format: header.payload.signature
+  //     const payloadBase64 = token.split('.')[1];
+  //     const payloadJson = atob(payloadBase64);
+  //     const payload = JSON.parse(payloadJson);
   
-      // Extract the userId from the specific claim
-      const userIdString = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
-      const roleString = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+  //     // Extract the userId from the specific claim
+  //     const userIdString = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+  //     const roleString = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
       
-      if (!userIdString || !roleString) return null;
+  //     if (!userIdString || !roleString) return null;
   
-      return{
-        userId:parseInt(userIdString,10),
-        role:roleString
-      }
+  //     return{
+  //       userId:parseInt(userIdString,10),
+  //       role:roleString
+  //     }
   
-    } catch (error) {
-      console.error('Error parsing JWT token:', error);
-      return null;
-    }
-  }
+  //   } catch (error) {
+  //     console.error('Error parsing JWT token:', error);
+  //     return null;
+  //   }
+  // }
 
   loadNotification(){
     this.taskService.getTaskNotificationAdmin().subscribe({
@@ -274,8 +278,9 @@ getTask(){
   
     this.userService.getUserbyId(userInfo.userId).subscribe({
       next: (data) => {
-        debugger
+       // debugger
         this.userByid=data;
+        this.orginalUserName=this.userByid.userName;
         this.userFormSettings.patchValue({
           name: this.userByid.name,
           userName: this.userByid.userName,
@@ -310,6 +315,10 @@ getTask(){
 
    UsernameExistsValidator(): AsyncValidatorFn {
     return (control: AbstractControl) => {
+      if(control.value===this.orginalUserName){
+        return of(null);
+
+      }
       return control.valueChanges.pipe(
         debounceTime(300),
         switchMap(username => this.userService.checkUsernameExists(username)),
@@ -320,7 +329,7 @@ getTask(){
   }
 
   updateUser(){
-    debugger
+    //debugger
     console.log(this.userFormSettings.value);
     if(this.userFormSettings.invalid)
     {
@@ -371,6 +380,66 @@ getTask(){
     return this.userFormSettings.get('phoneNumber');
   }
 
- 
+  openPassswordModel()
+  {
+    //this.pswdForm.patchValue({id:user.id})
+    const pswdModel = document.getElementById('passwordModal');
+    if(pswdModel != null)
+    {
+      pswdModel.style.display = 'block';
+    }
+  }
+
+  closePswdModel(){
+    // this.setFormState();
+     if(this.passwordModal != null)
+     {
+       this.passwordModal.nativeElement.style.display = 'none';
+     }
+   }
+
+   passwordsMatchValidator(): ValidatorFn {
+    return (group: AbstractControl): {[key: string]: any} | null => {
+      const newPassword = group.get('newpswd')?.value;
+      const confirmPassword = group.get('confrmNewpswd')?.value;
+      return newPassword === confirmPassword ? null : { passwordMismatch: true };
+    };
+  }
+
+   setPswdFormState()
+  {
+    this.pswdForm = this.fb.group({
+      id: this.getUserInfoFromToken()?.userId,
+      curpswd: ['',[Validators.required]],
+      newpswd: ['',[Validators.required]],
+      confrmNewpswd: ['',[Validators.required]]
+
+    },{Validators:this.passwordsMatchValidator()} );
+  }
+
+
+   updatePassword(){
+    if(this.pswdForm.invalid){
+      alert('Please fill in all fields and ensure passwords match.')
+      return;
+    }
+     this.formValue=this.pswdForm.value;
+
+    this.userService.updatepassword(this.formValue).subscribe({
+      next:()=>{
+        alert('Password updated successfully');
+        this.pswdForm.reset();
+        this.closePswdModel();
+      },
+      error:(err)=>{
+        console.error('Failed to update user', err);
+        this.logger.error('Failed to update user', err);
+        this.errorHandler.handleError(err);
+        alert('Failed to update user. Please try again later.');
+      }
+    });
+
+
+  }
 
 }

@@ -2,7 +2,7 @@ import { Component, ElementRef, ViewChild, inject,ErrorHandler,HostListener} fro
 import { Tasks } from '../../Models/tasks';
 import { CommonModule } from '@angular/common';
 import { UserAuthService } from '../../Services/user-auth.service';
-import { AbstractControl, FormsModule,ReactiveFormsModule, FormBuilder, FormGroup, ValidationErrors, Validators,AsyncValidatorFn } from '@angular/forms';
+import { AbstractControl, FormsModule,ReactiveFormsModule, FormBuilder, FormGroup, ValidationErrors, Validators,AsyncValidatorFn,ValidatorFn } from '@angular/forms';
 import { TasksService } from '../../Services/tasks.service';
 import { jwtDecode } from 'jwt-decode';
 import { LoggerServiceService } from '../../Services/logger-service.service';
@@ -11,22 +11,24 @@ import { interval,Subscription } from 'rxjs';
 import { timer } from 'rxjs';
 import { UsersService } from '../../Services/users.service';
 import { Users } from '../../Models/users';
-import { debounceTime, first, map, switchMap } from 'rxjs';
+import { debounceTime, first, map, switchMap,of } from 'rxjs';
+import { RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-user-dashboard',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule,RouterLink],
   templateUrl: './user-dashboard.component.html',
   styleUrl: './user-dashboard.component.css'
 })
 export class UserDashboardComponent {
 @ViewChild('myModal') model : ElementRef | undefined;
 @ViewChild('settingsModel') settingModel : ElementRef | undefined;
+@ViewChild('passwordModal') passwordModal : ElementRef | undefined;
 
 private readonly JWT_TOKEN = 'JWT_TOKEN';
 private notificationSubscription?: Subscription;
 notificationDropdownVisible=false;
-
+orginalUserName:string='';
 
 //Task Filter
   tasks: Tasks[] = [];
@@ -41,6 +43,7 @@ notificationDropdownVisible=false;
 
   taskForm : FormGroup = new FormGroup({});
   userFormSettings : FormGroup = new FormGroup({});
+  pswdForm: FormGroup = new FormGroup({});
 
   filters = {
     type:'',
@@ -100,6 +103,7 @@ notificationDropdownVisible=false;
     this.getTasks();
     this.countTaskStatuses(); 
     this.setFormStateSettings();
+    this.setPswdFormState();
 
     this.notificationSubscription=timer(10000).subscribe(()=>{this.loadNotification();this.notificationSubscription?.unsubscribe()})
   }
@@ -375,6 +379,7 @@ notificationDropdownVisible=false;
     this.userService.getUserbyId(userInfo.userId).subscribe({
       next: (data) => {
         this.userByid=data;
+        this.orginalUserName=this.userByid.userName;
         this.userFormSettings.patchValue({
           name: this.userByid.name,
           userName: this.userByid.userName,
@@ -472,7 +477,7 @@ notificationDropdownVisible=false;
         // Validators.pattern('^[a-zA-Z0-9._%+-]+@example\\.com$')
         Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$') 
         ]],
-      password: ['',[Validators.required]],
+      //password: ['',[Validators.required]],
       roleid: this.getUserInfoFromToken()?.roleId,
       phoneNumber: ['',[Validators.required, Validators.maxLength(10), Validators.minLength(10),Validators.pattern(/^[0-9]{10}$/)]],
       gender: ['',Validators.required]
@@ -483,6 +488,10 @@ notificationDropdownVisible=false;
 
   UsernameExistsValidator(): AsyncValidatorFn {
     return (control: AbstractControl) => {
+      if(control.value===this.orginalUserName){
+        return of(null);
+
+      }
       return control.valueChanges.pipe(
         debounceTime(300),
         switchMap(username => this.userService.checkUsernameExists(username)),
@@ -490,6 +499,68 @@ notificationDropdownVisible=false;
         first()
       );
     };
+  }
+
+  openPassswordModel()
+  {
+    //this.pswdForm.patchValue({id:user.id})
+    const pswdModel = document.getElementById('passwordModal');
+    if(pswdModel != null)
+    {
+      pswdModel.style.display = 'block';
+    }
+  }
+
+  closePswdModel(){
+    // this.setFormState();
+     if(this.passwordModal != null)
+     {
+       this.passwordModal.nativeElement.style.display = 'none';
+     }
+   }
+
+   passwordsMatchValidator(): ValidatorFn {
+    return (group: AbstractControl): {[key: string]: any} | null => {
+      const newPassword = group.get('newpswd')?.value;
+      const confirmPassword = group.get('confrmNewpswd')?.value;
+      return newPassword === confirmPassword ? null : { passwordMismatch: true };
+    };
+  }
+
+   setPswdFormState()
+  {
+    this.pswdForm = this.fb.group({
+      id: this.getUserInfoFromToken()?.userId,
+      curpswd: ['',[Validators.required]],
+      newpswd: ['',[Validators.required]],
+      confrmNewpswd: ['',[Validators.required]]
+
+    },{Validators:this.passwordsMatchValidator()} );
+  }
+
+
+   updatePassword(){
+    if(this.pswdForm.invalid){
+      alert('Please fill in all fields and ensure passwords match.')
+      return;
+    }
+     this.formValue=this.pswdForm.value;
+
+    this.userService.updatepassword(this.formValue).subscribe({
+      next:()=>{
+        alert('Password updated successfully');
+        this.pswdForm.reset();
+        this.closePswdModel();
+      },
+      error:(err)=>{
+        console.error('Failed to update user', err);
+        this.logger.error('Failed to update user', err);
+        this.errorHandler.handleError(err);
+        alert('Failed to update user. Please try again later.');
+      }
+    });
+
+
   }
 
 

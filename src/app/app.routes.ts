@@ -6,6 +6,8 @@ import { AuthUsersComponent } from './Components/auth-users/auth-users.component
 import { authGuard } from './Guard/auth.guard';
 import { UserDashboardComponent } from './Components/user-dashboard/user-dashboard.component';
 import { ForgotPasswordComponent } from './Components/forgot-password/forgot-password.component';
+import { AdminSettingsComponent } from './Components/admin-settings/admin-settings.component';
+import { UserSettingsComponent } from './Components/user-settings/user-settings.component';
 
 
 export const routes: Routes = [
@@ -31,6 +33,12 @@ export const routes: Routes = [
     },
     {
         path: 'forgotpassword', component:ForgotPasswordComponent
+    },
+    {
+        path:'adminsettings',component:AdminSettingsComponent
+    },
+    {
+        path:'usersettings',component:UserSettingsComponent
     }
 
 
