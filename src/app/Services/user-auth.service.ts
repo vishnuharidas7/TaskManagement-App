@@ -56,21 +56,13 @@ export class UserAuthService {
 
   }
  
-  // private storeJwtToken(jwt: any): void {
-  //   sessionStorage.setItem(
-  //     this.JWT_TOKEN,
-  //     typeof jwt === 'string' ? jwt : JSON.stringify(jwt)
-  //   );
-
-  // }
+ 
  
   private storeJwtToken(tokens: { accessToken: string, refreshToken: string }): void {
     sessionStorage.setItem(this.JWT_TOKEN, JSON.stringify(tokens));
   }
 
-  // getCurrentAuthUser(): Observable<any> {
-  //   return this.http.get('https://localhost:7268/api/Auth/me');
-  // }
+ 
  
   isLoggedIn(): boolean {
     return !!sessionStorage.getItem(this.JWT_TOKEN);

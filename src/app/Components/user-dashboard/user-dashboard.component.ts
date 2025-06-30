@@ -43,6 +43,7 @@ notificationDropdownVisible=false;
   userFormSettings : FormGroup = new FormGroup({});
 
   filters = {
+    type:'',
     date: '',
     status: '',
     priority: ''
@@ -50,7 +51,8 @@ notificationDropdownVisible=false;
   
   statuses: string[] = ['New', 'OnDue', 'Completed']; // customize as needed
   priorities: string[] = ['Low', 'Medium', 'High']; // customize as needed
-  
+  types : string[] = ['Feature', 'User Story', 'Bug', 'Testing'];
+
   allTasks: Tasks[] = []; // original data
   filteredTasks: Tasks[] = [];
   paginatedTasks: Tasks[] = [];
@@ -59,15 +61,17 @@ notificationDropdownVisible=false;
   totalPages: number = 1;
   
   applyFilters(): void {
-    const { date, status, priority } = this.filters;
+    const { date, type, status, priority } = this.filters;
   
     this.filteredTasks = this.allTasks.filter(task => {
       //const matchesName = name ? task.userName.toLowerCase().includes(name.toLowerCase()) : true;
+      
       const matchesDate = date ? new Date(task.dueDate).toDateString() === new Date(date).toDateString() : true;
+      const matchesType = type ? task.taskType === type : true;
       const matchesStatus = status ? task.taskStatus === status : true;
       const matchesPriority = priority ? task.priority === priority : true;
   
-      return matchesDate && matchesStatus && matchesPriority;
+      return matchesDate && matchesType && matchesStatus && matchesPriority;
     });
   
     this.totalPages = Math.ceil(this.filteredTasks.length / this.pageSize);
@@ -160,6 +164,7 @@ notificationDropdownVisible=false;
       dueDate: ['',[Validators.required, this.noPastDateValidator]],
       taskDescription:['',Validators.required] ,
       priority:['',Validators.required],
+      taskType:['',Validators.required],
       userName: [''],
       taskStatus: ['', Validators.required],
       createdBy: userId 
@@ -315,7 +320,7 @@ notificationDropdownVisible=false;
       dueDate: this.toDateInputFormat(Task.dueDate),
       userName: Task.userName
     });
-      this.getTasks();
+      //this.getTasks();
   }
 
   onDelete(id : number)
