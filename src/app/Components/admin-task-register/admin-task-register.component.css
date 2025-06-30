@@ -37,3 +37,24 @@
     margin-left: 240px; /* same as sidebar width */
     padding: 20px;
   }
+
+  /* Prevent long text from breaking layout */
+.table td,
+.table th {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+/* Allow wrapping in description only */
+.table td.description-cell {
+  white-space: normal;
+  word-wrap: break-word;
+  max-width: 250px;
+}
+
+/* Ensure action buttons stay compact */
+.table td.text-center {
+  white-space: nowrap;
+}

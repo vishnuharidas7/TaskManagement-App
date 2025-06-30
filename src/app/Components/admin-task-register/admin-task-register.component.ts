@@ -53,13 +53,15 @@ export class AdminTaskRegisterComponent {
 
 filters = {
   name: '',
+  type:'',
   date: '',
   status: '',
   priority: ''
 };
 
-statuses: string[] = ['New', 'OnDue', 'Completed']; // customize as needed
-priorities: string[] = ['Low', 'Medium', 'High']; // customize as needed
+statuses: string[] = ['New', 'OnDue', 'Completed']; 
+priorities: string[] = ['Low', 'Medium', 'High']; 
+types : string[] = ['Feature', 'User Story', 'Bug', 'Testing'];
 
 allTasks: Tasks[] = []; // original data
 filteredTasks: Tasks[] = [];
@@ -69,15 +71,16 @@ pageSize: number = 10;
 totalPages: number = 1;
 
 applyFilters(): void {
-  const { name, date, status, priority } = this.filters;
+  const { name, type, date, status, priority } = this.filters;
 
   this.filteredTasks = this.allTasks.filter(task => {
     const matchesName = name ? task.userName.toLowerCase().includes(name.toLowerCase()) : true;
+    const matchesType = type ? task.taskType === type : true;
     const matchesDate = date ? new Date(task.dueDate).toDateString() === new Date(date).toDateString() : true;
     const matchesStatus = status ? task.taskStatus === status : true;
     const matchesPriority = priority ? task.priority === priority : true;
 
-    return matchesName && matchesDate && matchesStatus && matchesPriority;
+    return matchesName && matchesType && matchesDate && matchesStatus && matchesPriority;
   });
 
   this.totalPages = Math.ceil(this.filteredTasks.length / this.pageSize);
@@ -266,6 +269,7 @@ get fileuploadControl()
       userId: ['',Validators.required],
       dueDate: ['',[Validators.required, this.noPastDateValidator]],
       taskDescription:['',Validators.required] ,
+      taskType:['',Validators.required],
       priority:['',Validators.required],
       userName: ['Ram'],
       taskStatus:[''],
