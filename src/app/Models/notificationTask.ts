@@ -4,4 +4,5 @@ export interface NotificationTask{
     dueDate: string;
     taskStatus: string;
     userName:string;
+    referenceId:string
 }

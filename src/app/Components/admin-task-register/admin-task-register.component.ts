@@ -56,7 +56,8 @@ filters = {
   type:'',
   date: '',
   status: '',
-  priority: ''
+  priority: '',
+  taskId :''
 };
 
 statuses: string[] = ['New', 'OnDue', 'Completed']; 
@@ -71,7 +72,7 @@ pageSize: number = 10;
 totalPages: number = 1;
 
 applyFilters(): void {
-  const { name, type, date, status, priority } = this.filters;
+  const { name, type, date, status, priority ,taskId } = this.filters;
 
   this.filteredTasks = this.allTasks.filter(task => {
     const matchesName = name ? task.userName.toLowerCase().includes(name.toLowerCase()) : true;
@@ -79,8 +80,9 @@ applyFilters(): void {
     const matchesDate = date ? new Date(task.dueDate).toDateString() === new Date(date).toDateString() : true;
     const matchesStatus = status ? task.taskStatus === status : true;
     const matchesPriority = priority ? task.priority === priority : true;
+    const matchesReferenceId = taskId ? task.referenceId?.toLowerCase().includes(taskId.toLowerCase()) : true;
 
-    return matchesName && matchesType && matchesDate && matchesStatus && matchesPriority;
+    return matchesName && matchesType && matchesDate && matchesStatus && matchesPriority&&matchesReferenceId;
   });
 
   this.totalPages = Math.ceil(this.filteredTasks.length / this.pageSize);

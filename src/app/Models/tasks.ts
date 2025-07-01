@@ -8,5 +8,6 @@ export interface Tasks {
     dueDate:Date,
     priority:string,
     createdBy:number,
-    taskType:string
+    taskType:string,
+    referenceId:string
 }

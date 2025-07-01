@@ -49,7 +49,8 @@ orginalUserName:string='';
     type:'',
     date: '',
     status: '',
-    priority: ''
+    priority: '',
+    taskId:''
   };
   
   statuses: string[] = ['New', 'OnDue', 'Completed']; // customize as needed
@@ -64,7 +65,7 @@ orginalUserName:string='';
   totalPages: number = 1;
   
   applyFilters(): void {
-    const { date, type, status, priority } = this.filters;
+    const { date, type, status, priority,taskId } = this.filters;
   
     this.filteredTasks = this.allTasks.filter(task => {
       //const matchesName = name ? task.userName.toLowerCase().includes(name.toLowerCase()) : true;
@@ -73,8 +74,9 @@ orginalUserName:string='';
       const matchesType = type ? task.taskType === type : true;
       const matchesStatus = status ? task.taskStatus === status : true;
       const matchesPriority = priority ? task.priority === priority : true;
+      const matchesTaskId=taskId ? task.referenceId?.toLowerCase().includes(taskId.toLowerCase()):true;
   
-      return matchesDate && matchesType && matchesStatus && matchesPriority;
+      return matchesDate && matchesType && matchesStatus && matchesPriority && matchesTaskId;
     });
   
     this.totalPages = Math.ceil(this.filteredTasks.length / this.pageSize);
@@ -359,6 +361,7 @@ orginalUserName:string='';
     }
     this.taskService.getTaskNotification(userInfo.userId).subscribe({
       next: (data) => {
+        debugger
         this.notifications = data;
       },
       error: (err) => console.error('Failed to load notifications:', err)
