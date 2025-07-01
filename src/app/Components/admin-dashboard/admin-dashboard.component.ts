@@ -39,8 +39,20 @@ export class AdminDashboardComponent implements OnInit {
   taskCount:number=0;
 
 //Pagination 
-currentPage: number = 1;
+// currentPage: number = 1;
+// pageSize: number = 5;
+// get paginatedTasks() {
+//   const start = (this.currentPage - 1) * this.pageSize;
+//   return this.taskLists.slice(start, start + this.pageSize);
+// }
+
+// get totalPages(): number {
+//   return Math.ceil(this.taskLists.length / this.pageSize);
+// }
+pageSizeOptions: number[] = [5, 10, 20, 50, 100];
 pageSize: number = 5;
+currentPage: number = 1;
+
 get paginatedTasks() {
   const start = (this.currentPage - 1) * this.pageSize;
   return this.taskLists.slice(start, start + this.pageSize);
@@ -48,6 +60,12 @@ get paginatedTasks() {
 
 get totalPages(): number {
   return Math.ceil(this.taskLists.length / this.pageSize);
+}
+
+onPageSizeChange(event: Event) {
+  const selectedValue = (event.target as HTMLSelectElement).value;
+  this.pageSize = parseInt(selectedValue, 10);
+  this.currentPage = 1; // Reset to first page when page size changes
 }
 
 
