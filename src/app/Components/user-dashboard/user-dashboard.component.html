@@ -15,7 +15,7 @@
        <!-- Notification Dropdown -->
       <div class="notification-dropdown" *ngIf="notificationDropdownVisible && notifications.length > 0">
         <div *ngFor="let note of notifications">
-         <p><strong>{{ note.taskName }}</strong> is due on {{ note.dueDate | date:'mediumDate' }} (Status: {{ note.taskStatus }})</p>
+         <p><strong>Task-ID:-{{note.referenceId}}</strong> is due on {{ note.dueDate | date:'mediumDate' }} (Status: {{ note.taskStatus }})</p>
         </div>
      </div>
       </div>
@@ -68,6 +68,18 @@
             class="form-control"
             [(ngModel)]="filters.date"
             name="filterDate"
+            (ngModelChange)="applyFilters()"
+          />
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">Filter by Reference ID</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="filters.taskId"
+            placeholder="e.g., TMS-19999"
+            name="filterTaskId"
             (ngModelChange)="applyFilters()"
           />
         </div>
@@ -142,7 +154,7 @@
           <tbody>
             <tr *ngFor="let task of paginatedTasks; let i = index">
               <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-              <td>{{task.taskId}}</td>
+              <td>{{task.refrenceId}}</td>
               <td>{{ task.taskType }}</td>
               <td>{{ task.taskName }}</td>
               <td><span class="badge bg-info text-dark">{{ task.taskStatus }}</span></td>

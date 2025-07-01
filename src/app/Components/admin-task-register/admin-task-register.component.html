@@ -135,6 +135,17 @@
               (ngModelChange)="applyFilters()"
             />
           </div>
+          <div class="col-md-3">
+            <label class="form-label">Filter by Reference ID</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="e.g., TMS-19999"
+              [(ngModel)]="filters.taskId"
+              name="filterReferenceId"
+              (ngModelChange)="applyFilters()"
+            />
+          </div>
 
           <!-- <div class="col-md-3">
             <label class="form-label">Filter by Type</label>
@@ -230,7 +241,7 @@
             <tbody>
               <tr *ngFor="let task of paginatedTasks; let i = index">
                 <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-                <td>{{task.taskId}}</td>
+                <td>{{task.referenceId}}</td>
                 <td>{{task.taskType}}</td>
                 <td>{{ task.taskName }}</td>
                 <td><span class="badge bg-info">{{ task.taskStatus }}</span></td>

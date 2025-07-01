@@ -29,7 +29,7 @@
        <!-- Notification Dropdown -->
       <div class="notification-dropdown" *ngIf="notificationDropdownVisible && notifications.length > 0">
         <div *ngFor="let note of notifications">
-         <p><strong>{{ note.taskName }}</strong> is due on {{ note.dueDate | date:'mediumDate' }},assigned to {{note.userName}} (Status: {{ note.taskStatus }})</p>
+         <p><strong>Task-ID:-{{note.referenceId}}</strong> is due on {{ note.dueDate | date:'mediumDate' }},assigned to {{note.userName}} (Status: {{ note.taskStatus }})</p>
         </div>
      </div>
     </nav>
@@ -80,7 +80,7 @@
                 <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
               <!-- <tr *ngFor="let task of taskLists; let i = index">
                 <td>{{ i + 1 }}</td> -->
-                <td>{{task.taskId}}</td>
+                <td>{{task.referenceId}}</td>
                 <td>{{task.taskType}}</td>
                 <td>{{ task.taskName }}</td>
                 <td><span class="badge bg-info">{{ task.taskStatus }}</span></td>
