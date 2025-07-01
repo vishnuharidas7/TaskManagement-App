@@ -154,7 +154,7 @@
           <tbody>
             <tr *ngFor="let task of paginatedTasks; let i = index">
               <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-              <td>{{task.refrenceId}}</td>
+              <td>{{task.referenceId}}</td>
               <td>{{ task.taskType }}</td>
               <td>{{ task.taskName }}</td>
               <td><span class="badge bg-info text-dark">{{ task.taskStatus }}</span></td>
