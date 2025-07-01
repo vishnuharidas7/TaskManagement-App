@@ -15,6 +15,7 @@ export class AuthUsersComponent {
   username = '';
   password = '';
   user?:any;
+  isLoading = false;
  
   validationErrors: string[] = [];
 
@@ -28,25 +29,31 @@ export class AuthUsersComponent {
 
   loginFunction(event: Event) {
     event.preventDefault();
+    if (this.isLoading) return;
+
+    this.isLoading = true;
     this.validationErrors = [];
   
     this.authService.login({ UserName: this.username, Password: this.password }).subscribe({
       next: () => {
         const role = sessionStorage.getItem('user_role');
         console.log("User role:", role);
-        alert("Login Successfully");
+        // alert("Login Successfully");
         this.logger.info("UI-Login successfully");
   
+        setTimeout(() => {
+          this.isLoading = false;
         if (role === 'Admin') {
           this.router.navigate(['/adminDashboard']);
         } else {
           this.router.navigate(['/userDashboard']);
         }
+      }, 1000);
       },
       error: (err) => {
-        debugger
         console.error("Login Failed:", err);
-        this.logger.error("Login failed", err)
+        this.logger.error("Login failed", err);
+        this.isLoading = false;
         const errorMessage =
         err.error?.message === "An unexpected error occurred. Please try again later."
           ? err.error?.detail

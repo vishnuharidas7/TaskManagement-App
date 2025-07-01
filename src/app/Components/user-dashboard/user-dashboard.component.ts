@@ -61,8 +61,9 @@ orginalUserName:string='';
   filteredTasks: Tasks[] = [];
   paginatedTasks: Tasks[] = [];
   currentPage: number = 1;
-  pageSize: number = 10;
+  pageSize: number = 5;
   totalPages: number = 1;
+  pageSizeOptions: number[] = [5, 10, 20, 50, 100];
   
   applyFilters(): void {
     const { date, type, status, priority,taskId } = this.filters;
@@ -84,6 +85,15 @@ orginalUserName:string='';
     this.updatePaginatedTasks();
   }
   
+  onPageSizeChange(event: Event): void {
+    const selected = (event.target as HTMLSelectElement).value;
+    this.pageSize = parseInt(selected, 10);
+    this.currentPage = 1; // Reset page to 1 when size changes
+    this.totalPages = Math.ceil(this.filteredTasks.length / this.pageSize);
+    this.updatePaginatedTasks();
+  }
+  
+
   updatePaginatedTasks(): void {
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
