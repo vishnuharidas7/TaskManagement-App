@@ -113,6 +113,15 @@
       </form>
     </div>
   
+    <div class="d-flex justify-content-end align-items-center mb-3">
+      <label for="pageSizeSelect" class="me-2">Rows per page:</label>
+      <select id="pageSizeSelect" class="form-select w-auto"
+              [value]="pageSize"
+              (change)="onPageSizeChange($event)">
+        <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+      </select>
+    </div>
+
     <!-- Task Table -->
     <div class="card-body">
       <div class="table-responsive">
