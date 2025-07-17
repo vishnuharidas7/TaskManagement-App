@@ -134,17 +134,67 @@ get userNameControl()
   }
 
   
-  onSubmit(){
+  // onSubmit(){
+  //   console.log(this.userForm.value);
+  //   if(this.userForm.invalid)
+  //   {
+  //     alert('Please Fill All Fields....');
+  //     return;
+  //   }
+  //   this.formValue = this.userForm.value;
+
+  //   if(this.userForm.value.id == 0)
+  //   {
+  //     this.userService.addUser(this.formValue).subscribe({
+  //       next: () => {
+  //         alert('User Added Successfully....');
+  //         this.getUser();
+  //         this.userForm.reset();
+  //         this.closeModal();
+  //       },
+  //       error: (error) => {
+  //         console.log('Error status:', error.status);
+  //         console.log('Error response:', error.error);
+  //         console.error("User added faild:", error);
+  //         this.logger.error("User added faild:", error)
+  //         if (error.status === 400 && error.error?.error === "Email already exists.") {
+  //           const emailCtrl = this.emailControl;
+  //           if(emailCtrl){
+  //           emailCtrl.setErrors({ emailExists: true });
+  //           }
+  //         }
+  //       }
+  //     });
+  //   }
+  //   else{
+  //     this.userService.updateUser(this.formValue).subscribe({
+  //       next: (res) => {
+  //         alert('User Updated Successfully....');
+  //         this.logger.info('User updated successfully');
+  //         this.getUser();
+  //         this.userForm.reset();
+  //         this.closeModal();
+  //       },
+  //       error: (err) => {
+  //         console.error('Failed to update user', err);
+  //         this.logger.error('Failed to update user', err);
+  //         this.errorHandler.handleError(err);
+  //         alert('Failed to update user. Please try again later.');
+  //       }
+  //     });
+  //   }
+  // }
+
+  onSubmit() {
     console.log(this.userForm.value);
-    if(this.userForm.invalid)
-    {
+    if (this.userForm.invalid) {
       alert('Please Fill All Fields....');
       return;
     }
+  
     this.formValue = this.userForm.value;
-
-    if(this.userForm.value.id == 0)
-    {
+  
+    if (this.userForm.value.id == 0) {
       this.userService.addUser(this.formValue).subscribe({
         next: () => {
           alert('User Added Successfully....');
@@ -155,18 +205,22 @@ get userNameControl()
         error: (error) => {
           console.log('Error status:', error.status);
           console.log('Error response:', error.error);
-          console.error("User added faild:", error);
-          this.logger.error("User added faild:", error)
+          console.error("User add failed:", error);
+          this.logger.error("User add failed:", error);
+  
+          // ✅ Alert backend error message
+          const errorMessage = error.error?.message || error.error?.error || error.message || 'Something went wrong.';
+          alert(`Error: ${errorMessage}`);
+  
           if (error.status === 400 && error.error?.error === "Email already exists.") {
             const emailCtrl = this.emailControl;
-            if(emailCtrl){
-            emailCtrl.setErrors({ emailExists: true });
+            if (emailCtrl) {
+              emailCtrl.setErrors({ emailExists: true });
             }
           }
         }
       });
-    }
-    else{
+    } else {
       this.userService.updateUser(this.formValue).subscribe({
         next: (res) => {
           alert('User Updated Successfully....');
@@ -179,14 +233,18 @@ get userNameControl()
           console.error('Failed to update user', err);
           this.logger.error('Failed to update user', err);
           this.errorHandler.handleError(err);
-          alert('Failed to update user. Please try again later.');
+  
+          // ✅ Alert backend error message
+          const errorMessage = err.error?.message || err.error?.error || err.message || 'Failed to update user.';
+          alert(`Error: ${errorMessage}`);
         }
       });
     }
   }
+  
 
   onEdit(user:Users)
-  { //debugger
+  {  
     this.openModal();
     this.orginalUserName=user.userName;
     this.userForm.patchValue(

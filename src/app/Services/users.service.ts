@@ -36,8 +36,7 @@ export class UsersService {
   }
 
   addUser(data : any)
-  {
-    debugger
+  { 
     return this.http.post(this.addUserApiUrl, data);
   }
 
@@ -52,13 +51,11 @@ export class UsersService {
   }
   
   getUserbyId(id:number)
-  {
-    //debugger
+  { 
     return this.http.get<Users>(`${this.getUserById}/${id}`);
 
   }
-  updatepassword(pswdUpdate : UpdatePswd){
-    debugger
+  updatepassword(pswdUpdate : UpdatePswd){ 
     return this.http.put(`${this.updatePasswordApiUrl}/${pswdUpdate.id}`,pswdUpdate);
   }
 

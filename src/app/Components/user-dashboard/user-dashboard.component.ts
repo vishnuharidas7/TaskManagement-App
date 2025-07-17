@@ -370,8 +370,7 @@ orginalUserName:string='';
       return;
     }
     this.taskService.getTaskNotification(userInfo.userId).subscribe({
-      next: (data) => {
-        debugger
+      next: (data) => { 
         this.notifications = data;
       },
       error: (err) => console.error('Failed to load notifications:', err)
@@ -380,8 +379,7 @@ orginalUserName:string='';
   }
 
 
-  goToSettingsOpenModal() {
-    //debugger
+  goToSettingsOpenModal() { 
     const userInfo = this.getUserInfoFromToken();
     if(!userInfo || userInfo==undefined)
     {
@@ -427,8 +425,7 @@ orginalUserName:string='';
  
 
 
-   updateUser(){
-    debugger
+   updateUser(){ 
     console.log(this.userFormSettings.value);
     if(this.userFormSettings.invalid)
     {

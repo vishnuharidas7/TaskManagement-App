@@ -285,8 +285,7 @@ getTask(){
 
   }
 
-  goToSettingsOpenModal() {
-    //debugger
+  goToSettingsOpenModal() { 
     const userInfo = this.getUserInfoFromToken();
     if(!userInfo || userInfo==undefined)
     {
@@ -295,15 +294,14 @@ getTask(){
     }
   
     this.userService.getUserbyId(userInfo.userId).subscribe({
-      next: (data) => {
-       // debugger
+      next: (data) => { 
         this.userByid=data;
         this.orginalUserName=this.userByid.userName;
         this.userFormSettings.patchValue({
           name: this.userByid.name,
           userName: this.userByid.userName,
           email: this.userByid.email,
-          password: this.userByid.password, // don't show real password
+          password: this.userByid.password,
           phoneNumber: this.userByid.phoneNumber,
           gender: this.userByid.gender,
           role:this.userByid.roleId
@@ -346,8 +344,7 @@ getTask(){
     };
   }
 
-  updateUser(){
-    //debugger
+  updateUser(){ 
     console.log(this.userFormSettings.value);
     if(this.userFormSettings.invalid)
     {

@@ -3,8 +3,7 @@ import { HttpInterceptorFn } from '@angular/common/http';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const jwtToken=getJwtToken();
   console.log("Attaching token",jwtToken)
-  if(jwtToken){
-    //debugger
+  if(jwtToken){ 
    var cloned= req.clone({
       setHeaders:{
         Authorization:`Bearer ${jwtToken}`,
