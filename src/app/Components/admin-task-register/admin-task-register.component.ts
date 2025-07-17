@@ -60,7 +60,7 @@ filters = {
   taskId :''
 };
 
-statuses: string[] = ['New', 'OnDue', 'Completed']; 
+status: string[] = ['New', 'Due', 'OverDue', 'Completed']; 
 priorities: string[] = ['Low', 'Medium', 'High']; 
 types : string[] = ['Feature', 'User Story', 'Bug', 'Testing'];
 
@@ -79,7 +79,7 @@ applyFilters(): void {
     const matchesName = name ? task.userName.toLowerCase().includes(name.toLowerCase()) : true;
     const matchesType = type ? task.taskType === type : true;
     const matchesDate = date ? new Date(task.dueDate).toDateString() === new Date(date).toDateString() : true;
-    const matchesStatus = status ? task.taskStatus === status : true;
+    const matchesStatus = status ? task.taskState === status : true;
     const matchesPriority = priority ? task.priority === priority : true;
     const matchesReferenceId = taskId ? task.referenceId?.toLowerCase().includes(taskId.toLowerCase()) : true;
 

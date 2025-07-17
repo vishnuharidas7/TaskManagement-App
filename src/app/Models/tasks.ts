@@ -9,5 +9,6 @@ export interface Tasks {
     priority:string,
     createdBy:number,
     taskType:string,
-    referenceId:string
+    referenceId:string,
+    taskState:string
 }
