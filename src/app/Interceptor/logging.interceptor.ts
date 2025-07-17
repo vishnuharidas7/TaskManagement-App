@@ -9,7 +9,6 @@ import { inject } from '@angular/core'; // <-- lowercase 'inject'
 
 
 export const loggingInterceptor: HttpInterceptorFn = (req, next) => {
-  //debugger
   // inject LoggerServiceService inside the function
   const logger = inject(LoggerServiceService);
 

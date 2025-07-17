@@ -94,8 +94,7 @@ export class UserSettingsComponent implements OnInit {
 
 
   setFormStateSettings()
-  {
-    debugger
+  { 
     this.userFormSettings = this.fb.group({
       id: this.getUserInfoFromToken()?.userId,
       name: ['',[Validators.required]],
@@ -150,8 +149,7 @@ export class UserSettingsComponent implements OnInit {
     });
   }
 
-  updateUser(){
-    debugger
+  updateUser(){ 
     console.log(this.userFormSettings.value);
     if(this.userFormSettings.invalid)
     {

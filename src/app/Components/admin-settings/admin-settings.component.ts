@@ -126,8 +126,7 @@ get userNameControl()
   }
 
   setFormStateSettings()
-  {
-    debugger
+  { 
     this.adminFormSettings = this.fb.group({
       id: this.getUserInfoFromToken()?.userId,
       name: ['',[Validators.required]],
@@ -158,8 +157,7 @@ get userNameControl()
     };
   }
 
-updateUser(){
-  debugger
+updateUser(){ 
   console.log(this.adminFormSettings.value);
   if(this.adminFormSettings.invalid)
   {
