@@ -58,3 +58,30 @@
 .table td.text-center {
   white-space: nowrap;
 }
+
+.fixed-table-container {
+  max-height: 500px; /* adjust as needed */
+  overflow-y: auto;
+}
+
+.sticky-header th {
+  position: sticky;
+  top: 0;
+  background: #f8f9fa; /* same as .table-light background */
+  z-index: 2;
+}
+
+.sortable-column {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sortable-column i {
+  font-size: 0.8rem;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.sortable-column:hover i {
+  opacity: 1;
+}
