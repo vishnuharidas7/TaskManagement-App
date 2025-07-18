@@ -72,6 +72,22 @@ pageSize: number = 5;
 totalPages: number = 1;
 pageSizeOptions: number[] = [5, 10, 20, 50, 100];
 
+sortColumn: string = '';
+sortDirection: 'asc' | 'desc' = 'asc';
+
+sortData(column: string): void {
+  if (this.sortColumn === column) {
+    // Toggle sort direction
+    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+  } else {
+    this.sortColumn = column;
+    this.sortDirection = 'asc';
+  }
+
+  this.applyFilters(); // Reapply filters and sorting
+}
+
+
 applyFilters(): void {
   const { name, type, date, status, priority ,taskId } = this.filters;
 
@@ -86,9 +102,32 @@ applyFilters(): void {
     return matchesName && matchesType && matchesDate && matchesStatus && matchesPriority&&matchesReferenceId;
   });
 
+  if (this.sortColumn) {
+    this.filteredTasks.sort((a: any, b: any) => {
+      const valueA = a[this.sortColumn];
+      const valueB = b[this.sortColumn];
+
+      // Handle string or number comparison
+      const comparison = typeof valueA === 'string'
+        ? valueA.localeCompare(valueB)
+        : valueA > valueB ? 1 : valueA < valueB ? -1 : 0;
+
+      return this.sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }
+
   this.totalPages = Math.ceil(this.filteredTasks.length / this.pageSize);
   this.currentPage = 1; // reset to first page
   this.updatePaginatedTasks();
+}
+
+getStartIndex(): number {
+  return (this.currentPage - 1) * this.pageSize;
+}
+
+getEndIndex(): number {
+  const end = this.getStartIndex() + this.paginatedTasks.length;
+  return end > this.filteredTasks.length ? this.filteredTasks.length : end;
 }
 
 onPageSizeChange(event: Event): void {
