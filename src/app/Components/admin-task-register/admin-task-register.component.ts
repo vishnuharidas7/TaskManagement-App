@@ -23,6 +23,7 @@ interface User {
 export class AdminTaskRegisterComponent {
   @ViewChild('myModal') model : ElementRef | undefined;
   @ViewChild('myModal1') model1 : ElementRef | undefined;
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   
   users: User[] = [];
   tasks: Tasks[] = [];
@@ -35,7 +36,7 @@ export class AdminTaskRegisterComponent {
   selectedFile: File | null = null;
   fileUploadError: string = '';
   private readonly JWT_TOKEN = 'JWT_TOKEN';
-
+  showFileInput = true;
   
 
 // //Pagination 
@@ -229,10 +230,31 @@ goToPage(page: number): void {
       this.model.nativeElement.style.display = 'none';
     }
 
-    if(this.model1 != null)
-    {
+    // if(this.model1 != null)
+    // {
+    //   this.model1.nativeElement.style.display = 'none';
+    // }
+    // if(this.fileInput)
+    // {
+    //   this.fileInput.nativeElement.value = '';
+    // }
+    // this.fileUploadForm.reset();
+    // this.selectedFile = null;
+    // this.fileUploadError = '';
+
+    if (this.model1 != null) {
       this.model1.nativeElement.style.display = 'none';
     }
+  
+    // Force re-render of file input
+    this.showFileInput = false;
+    setTimeout(() => {
+      this.showFileInput = true;
+    }, 0); // Short delay to re-insert element
+  
+    this.fileUploadForm.reset();
+    this.selectedFile = null;
+    this.fileUploadError = '';
   }
 
 
@@ -412,8 +434,9 @@ onFileUpload() {
   if (this.selectedFile) {
     const formData = new FormData();
     formData.append('file', this.selectedFile);
-
-    this.taskService.uploadTask(formData).subscribe({
+    const currentUserId = this.taskForm.get('createdBy')?.value;
+    formData.append('userId',currentUserId);
+    this.taskService.uploadTask(formData, currentUserId).subscribe({
       next: (response: string) => {
         if (response.trim().toLowerCase() === 'file processed and tasks saved.') {
           alert('✅ File uploaded and data saved successfully!');
