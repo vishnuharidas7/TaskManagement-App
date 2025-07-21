@@ -28,6 +28,7 @@ export class AdminSettingsComponent implements OnInit {
   userByid:Users|null=null;
   orginalUserName:string='';
   pswdForm:FormGroup=new FormGroup({});
+  pswdSubmitted: boolean = false;
 
 
   
@@ -236,9 +237,12 @@ updatePassword(){
     next:()=>{
       alert('Password updated successfully');
       this.pswdForm.reset();
+      this.pswdSubmitted = false;
       this.closePswdModel();
+      window.location.reload();
     },
     error:(err)=>{
+      this.pswdSubmitted = true;
       console.error('Failed to update user', err);
       this.logger.error('Failed to update user', err);
       this.errorHandler.handleError(err);
@@ -249,6 +253,7 @@ updatePassword(){
 
 openPassswordModel(){
   //this.pswdForm.patchValue({id:user.id})
+  this.pswdSubmitted=false;
   const pswdModel = document.getElementById('passwordModal');
   if(pswdModel != null)
   {

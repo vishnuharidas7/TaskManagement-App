@@ -23,6 +23,7 @@ export class UserSettingsComponent implements OnInit {
   userByid:Users|null=null;
   formValue: any;
   pswdForm:FormGroup=new FormGroup({});
+  pswdSubmitted: boolean = false;
 
   constructor(private authService: UserAuthService, private fb:FormBuilder,private userService:UsersService,
     private errorHandler:ErrorHandler,private logger:LoggerServiceService) {}
@@ -194,6 +195,7 @@ passwordsMatchValidator(): ValidatorFn {
 
   openPassswordModel(){
     //this.pswdForm.patchValue({id:user.id})
+    this.pswdSubmitted = false;
     const pswdModel = document.getElementById('passwordModal');
     if(pswdModel != null)
     {
@@ -220,9 +222,12 @@ passwordsMatchValidator(): ValidatorFn {
       next:()=>{
         alert('Password updated successfully');
         this.pswdForm.reset();
+        this.pswdSubmitted = true;
         this.closePswdModel();
+        window.location.reload();
       },
       error:(err)=>{
+        this.pswdSubmitted = true;
         console.error('Failed to update user', err);
         this.logger.error('Failed to update user', err);
         this.errorHandler.handleError(err);

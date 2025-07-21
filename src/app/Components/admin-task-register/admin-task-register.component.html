@@ -1,7 +1,6 @@
 
-
   <!-- Sidebar -->
-<div class="text-white p-3" id="sidebar">
+  <div class="text-white p-3" id="sidebar">
     <h4>Admin Panel</h4>
     <ul class="nav flex-column">
       <li class="nav-item"><a class="nav-link text-white" routerLink="/adminDashboard">Dashboard</a></li>
@@ -10,7 +9,7 @@
     </ul>
   </div>
 
-<div class="d-flex justify-content-end align-items-center gap-2 mb-3" id="main-content">
+  <div class="d-flex justify-content-end align-items-center gap-2 mb-3" id="main-content">
     <button class="btn btn-outline-primary" (click)="openModal()">
       <i class="bi bi-plus-circle me-1" ></i> Create Task
     </button>
@@ -426,13 +425,21 @@
                 <div *ngIf="fileUploadError" class="text-danger mt-1">
                   {{ fileUploadError }}
                 </div>
+                <!-- Spinner shown during upload -->
+                <div *ngIf="isUploading" class="text-center mt-3">
+                 <div class="spinner-border text-primary" role="status">
+                   <span class="visually-hidden">Uploading...</span>
+                 </div>
+                <div class="mt-1 text-muted">Uploading, please wait...</div>
+              </div>
+
               </div>
             </div>
         
           </div>
         
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary" [disabled]="!selectedFile">Upload</button>
+            <button type="submit" class="btn btn-primary" [disabled]="!selectedFile || isUploading">Upload</button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Cancel</button>
           </div>
         </form>

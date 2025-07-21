@@ -35,6 +35,7 @@ export class AdminTaskRegisterComponent {
   selectedFile: File | null = null;
   fileUploadError: string = '';
   private readonly JWT_TOKEN = 'JWT_TOKEN';
+  isUploading: boolean = false; // Spinner flag
 
   
 
@@ -410,11 +411,13 @@ get fileuploadControl()
 
 onFileUpload() {
   if (this.selectedFile) {
+    this.isUploading = true; // Start spinner
     const formData = new FormData();
     formData.append('file', this.selectedFile);
 
     this.taskService.uploadTask(formData).subscribe({
       next: (response: string) => {
+        this.isUploading = false; // Stop spinner
         if (response.trim().toLowerCase() === 'file processed and tasks saved.') {
           alert('✅ File uploaded and data saved successfully!');
           this.taskForm.reset();
@@ -430,6 +433,7 @@ onFileUpload() {
         }
       },
       error: (err) => {
+        this.isUploading = false; // Stop spinner
         this.logger.error('❌ File upload error', err);
         this.errorHandler.handleError(err);
         alert('❌ File upload failed. Please try again.');
