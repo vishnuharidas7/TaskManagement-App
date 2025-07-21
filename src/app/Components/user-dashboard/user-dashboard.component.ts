@@ -50,7 +50,8 @@ orginalUserName:string='';
     date: '',
     status: '',
     priority: '',
-    taskId:''
+    taskId:'',
+    taskNames:''
   };
   
   statuses: string[] = ['New', 'OnDue', 'Completed']; // customize as needed
@@ -66,18 +67,19 @@ orginalUserName:string='';
   pageSizeOptions: number[] = [5, 10, 20, 50, 100];
   
   applyFilters(): void {
-    const { date, type, status, priority,taskId } = this.filters;
+    const { date, type, status, priority,taskId,taskNames } = this.filters;
   
     this.filteredTasks = this.allTasks.filter(task => {
       //const matchesName = name ? task.userName.toLowerCase().includes(name.toLowerCase()) : true;
       
       const matchesDate = date ? new Date(task.dueDate).toDateString() === new Date(date).toDateString() : true;
+      const matchesTaskName=taskNames ? task.taskName?.toLowerCase().includes(taskNames.toLowerCase()):true;
       const matchesType = type ? task.taskType === type : true;
       const matchesStatus = status ? task.taskStatus === status : true;
       const matchesPriority = priority ? task.priority === priority : true;
       const matchesTaskId=taskId ? task.referenceId?.toLowerCase().includes(taskId.toLowerCase()):true;
   
-      return matchesDate && matchesType && matchesStatus && matchesPriority && matchesTaskId;
+      return matchesDate && matchesType && matchesStatus && matchesPriority && matchesTaskId&&matchesTaskName;
     });
   
     this.totalPages = Math.ceil(this.filteredTasks.length / this.pageSize);
@@ -161,7 +163,8 @@ orginalUserName:string='';
   
 
   toDateInputFormat(date: any): string {
-    return new Date(date).toISOString().split('T')[0];
+   // return new Date(date).toISOString().split('T')[0];
+   return date.split('T')[0];
   }
 
   get dueDateControl()

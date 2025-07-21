@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild, inject ,ErrorHandler} from '@angular/core';
-import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ReactiveFormsModule, Validators,ValidatorFn  } from '@angular/forms';
+import { AbstractControl,FormsModule,ValidationErrors,AsyncValidatorFn, FormBuilder, FormGroup, ReactiveFormsModule, Validators,ValidatorFn  } from '@angular/forms';
 import { Users } from '../../Models/users';
 import { UsersService } from '../../Services/users.service';
 import { CommonModule } from '@angular/common';
@@ -10,7 +10,7 @@ import { LoggerServiceService } from '../../Services/logger-service.service';
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,RouterLink],
+  imports: [CommonModule, ReactiveFormsModule,RouterLink,FormsModule],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css'
 })
@@ -27,10 +27,94 @@ private readonly JWT_TOKEN = 'JWT_TOKEN';
 constructor(private fb: FormBuilder,private logger:LoggerServiceService,private errorHandler:ErrorHandler){}
 formValue: any;
 
+filters = {
+  username: '',
+  role:'',
+  name:''
+};
+role: string[] = ['Admin', 'User']; 
+allUsers: Users[] = []; // original data
+currentPage: number = 1;
+pageSize: number = 5;
+paginatedUser: Users[] = [];
+filteredUser: Users[] = [];
+totalPages: number = 1;
+pageSizeOptions: number[] = [5, 10, 20, 50, 100];
+sortColumn: string = '';
+sortDirection: 'asc' | 'desc' = 'asc';
+
+sortData(column: string): void {
+  if (this.sortColumn === column) {
+    // Toggle sort direction
+    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+  } else {
+    this.sortColumn = column;
+    this.sortDirection = 'asc';
+  }
+
+  this.applyFilters(); // Reapply filters and sorting
+}
+
 ngOnInit(): void {
   this.setFormState();
-  this.setPswdFormState();
   this.getUser();
+  this.setPswdFormState();
+}
+
+applyFilters(): void {
+  const { username, role,name} = this.filters;
+
+  this.filteredUser  = this.allUsers.filter(user => {
+    const matchesUserName = username ? user.userName.toLowerCase().includes(username.toLowerCase()) : true;
+    const matchesName = name ? user.name.toLowerCase().includes(name.toLowerCase()) : true;
+    const matchesRole = role ? user.roleName === role : true;
+    return matchesUserName&& matchesName && matchesRole;
+  });
+  if (this.sortColumn) {
+    this.filteredUser.sort((a: any, b: any) => {
+      const valueA = a[this.sortColumn];
+      const valueB = b[this.sortColumn];
+
+      // Handle string or number comparison
+      const comparison = typeof valueA === 'string'
+        ? valueA.localeCompare(valueB)
+        : valueA > valueB ? 1 : valueA < valueB ? -1 : 0;
+
+      return this.sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }
+
+  this.totalPages = Math.ceil(this.filteredUser.length / this.pageSize);
+  this.currentPage = 1; // reset to first page
+  this.updatePaginatedTasks();
+}
+getStartIndex(): number {
+  return (this.currentPage - 1) * this.pageSize;
+}
+getEndIndex(): number {
+  const end = this.getStartIndex() + this.paginatedUser.length;
+  return end > this.filteredUser.length ? this.filteredUser.length : end;
+}
+onPageSizeChange(event: Event): void {
+  const selected = (event.target as HTMLSelectElement).value;
+  this.pageSize = parseInt(selected, 10);
+  this.currentPage = 1; // Reset page to 1 when size changes
+  this.totalPages = Math.ceil(this.filteredUser.length / this.pageSize);
+  this.updatePaginatedUsers();
+}
+updatePaginatedUsers(): void {
+  const start = (this.currentPage - 1) * this.pageSize;
+  const end = start + this.pageSize;
+  this.paginatedUser = this.filteredUser.slice(start, end);
+}
+updatePaginatedTasks(): void {
+  const start = (this.currentPage - 1) * this.pageSize;
+  const end = start + this.pageSize;
+  this.paginatedUser = this.filteredUser.slice(start, end);
+}
+goToPage(page: number): void {
+  this.currentPage = page;
+  this.updatePaginatedTasks();
 }
 
   openModal()
@@ -55,39 +139,19 @@ ngOnInit(): void {
 
 getUser()
 {
-  this.userService.getAllUsers().subscribe((res) => {
-    this.userList = res;
-  })
+  this.userService.getAllUsers().subscribe({
+    next: (res) => {
+      this.userList = res;
+      this.allUsers = res; // ✅ Needed for filtering
+      this.applyFilters();
+    },
+    error: (err) => {
+      this.logger.error("Failed to fetch User", err);         
+      this.errorHandler.handleError(err);                     
+      alert("Unable to load User. Please try again later.");  
+    }
+  });
 }
-
-// getUserInformationFromToken(): {userId:number,role:string} | null {
-//   const token = sessionStorage.getItem(this.JWT_TOKEN);
-//   //const token = localStorage.getItem('token');  // or wherever you store it
-
-//   if (!token) return null;
-
-//   try {
-//     // JWT format: header.payload.signature
-//     const payloadBase64 = token.split('.')[1];
-//     const payloadJson = atob(payloadBase64);
-//     const payload = JSON.parse(payloadJson);
-
-//     // Extract the userId from the specific claim
-//     const userIdString = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
-//     const roleString = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-    
-//     if (!userIdString || !roleString) return null;
-
-//     return{
-//       userId:parseInt(userIdString,10),
-//       role:roleString
-//     }
-
-//   } catch (error) {
-//     console.error('Error parsing JWT token:', error);
-//     return null;
-//   }
-// }
 
 get userNameControl()
 {
@@ -133,57 +197,6 @@ get userNameControl()
     };
   }
 
-  
-  // onSubmit(){
-  //   console.log(this.userForm.value);
-  //   if(this.userForm.invalid)
-  //   {
-  //     alert('Please Fill All Fields....');
-  //     return;
-  //   }
-  //   this.formValue = this.userForm.value;
-
-  //   if(this.userForm.value.id == 0)
-  //   {
-  //     this.userService.addUser(this.formValue).subscribe({
-  //       next: () => {
-  //         alert('User Added Successfully....');
-  //         this.getUser();
-  //         this.userForm.reset();
-  //         this.closeModal();
-  //       },
-  //       error: (error) => {
-  //         console.log('Error status:', error.status);
-  //         console.log('Error response:', error.error);
-  //         console.error("User added faild:", error);
-  //         this.logger.error("User added faild:", error)
-  //         if (error.status === 400 && error.error?.error === "Email already exists.") {
-  //           const emailCtrl = this.emailControl;
-  //           if(emailCtrl){
-  //           emailCtrl.setErrors({ emailExists: true });
-  //           }
-  //         }
-  //       }
-  //     });
-  //   }
-  //   else{
-  //     this.userService.updateUser(this.formValue).subscribe({
-  //       next: (res) => {
-  //         alert('User Updated Successfully....');
-  //         this.logger.info('User updated successfully');
-  //         this.getUser();
-  //         this.userForm.reset();
-  //         this.closeModal();
-  //       },
-  //       error: (err) => {
-  //         console.error('Failed to update user', err);
-  //         this.logger.error('Failed to update user', err);
-  //         this.errorHandler.handleError(err);
-  //         alert('Failed to update user. Please try again later.');
-  //       }
-  //     });
-  //   }
-  // }
 
   onSubmit() {
     console.log(this.userForm.value);
@@ -265,17 +278,38 @@ get userNameControl()
           this.getUser();
         },
         error: (err) => {
+          debugger
           console.error("Failed to delete user", err);
           this.logger.error("Failed to delete user", err);
           this.errorHandler.handleError(err);
+
+          if(err.status===400 && err.error?.detail){
+            alert(err.error.detail);
+          }else{
           alert("Failed to delete user. Please try again later.");
+          }
         }
       });
     }
   }
 
+  
+  setPswdFormState() {
+    this.pswdForm = this.fb.group({
+      id: 0,
+      curpswd: ['', [Validators.required]],
+      newpswd: ['', [Validators.required]],
+      confrmNewpswd: ['', [Validators.required]]
+    }, { validators: this.passwordsMatchValidator() }); 
+
+    this.pswdForm.get('newpswd')?.valueChanges.subscribe(() => {
+      this.pswdForm.get('confrmNewpswd')?.updateValueAndValidity();
+    });
+  }
+
   openPassswordModel(user:Users)
   {
+    this.setPswdFormState()
     this.pswdForm.patchValue({id:user.id})
     const pswdModel = document.getElementById('passwordModal');
     if(pswdModel != null)
@@ -292,27 +326,19 @@ get userNameControl()
   }
 
   passwordsMatchValidator(): ValidatorFn {
-    return (group: AbstractControl): {[key: string]: any} | null => {
+    return (group: AbstractControl): ValidationErrors | null => {
       const newPassword = group.get('newpswd')?.value;
       const confirmPassword = group.get('confrmNewpswd')?.value;
+      console.log('Validating passwords:', newPassword, confirmPassword);
+
+      if (!newPassword || !confirmPassword) return null;
       return newPassword === confirmPassword ? null : { passwordMismatch: true };
     };
   }
 
-  setPswdFormState()
-  {
-    this.pswdForm = this.fb.group({
-      id: 0,
-      curpswd: ['',[Validators.required]],
-      newpswd: ['',[Validators.required]],
-      confrmNewpswd: ['',[Validators.required]]
-
-    },{Validators:this.passwordsMatchValidator()} );
-  }
-
-
   updatePassword(){
     if(this.pswdForm.invalid){
+      this.pswdForm.markAllAsTouched();
       alert('Please fill in all fields and ensure passwords match.')
       return;
     }
@@ -331,8 +357,6 @@ get userNameControl()
         alert('Failed to update user. Please try again later.');
       }
     });
-
-
   }
 
 }

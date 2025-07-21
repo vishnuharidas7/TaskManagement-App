@@ -1,7 +1,6 @@
 
-
   <!-- Sidebar -->
-<div class="text-white p-3" id="sidebar">
+  <div class="text-white p-3" id="sidebar">
     <h4>Admin Panel</h4>
     <ul class="nav flex-column">
       <li class="nav-item"><a class="nav-link text-white" routerLink="/adminDashboard">Dashboard</a></li>
@@ -10,7 +9,7 @@
     </ul>
   </div>
 
-<div class="d-flex justify-content-end align-items-center gap-2 mb-3" id="main-content">
+  <div class="d-flex justify-content-end align-items-center gap-2 mb-3" id="main-content">
     <button class="btn btn-outline-primary" (click)="openModal()">
       <i class="bi bi-plus-circle me-1" ></i> Create Task
     </button>
@@ -148,28 +147,6 @@
       <div class="card-body">
         <div class="table-responsive fixed-table-container">
           <table class="table table-striped align-middle">
-            <!-- <thead class="table-light sticky-header">
-              <tr>
-                <th>#</th> 
-                <th (click)="sortData('referenceId')">
-                  Task ID
-                  <i *ngIf="sortColumn === 'referenceId'" class="bi" 
-                     [ngClass]="{
-                       'bi-caret-up-fill': sortDirection === 'asc',
-                       'bi-caret-down-fill': sortDirection === 'desc'
-                     }">
-                  </i>
-                </th>
-                <th (click)="sortData('taskType')">Task Type</th>
-                <th (click)="sortData('taskName')">Task</th>
-                <th (click)="sortData('taskStatus')">Status</th>
-                <th (click)="sortData('userName')">Assigned To</th>
-                <th (click)="sortData('priority')">Priority</th>
-                <th (click)="sortData('dueDate')">Due Date</th>
-                <th (click)="sortData('taskDescription')">Description</th>
-                <th class="text-center">Actions</th>
-              </tr>
-            </thead> -->
             <thead class="table-light sticky-header">
               <tr>
                 <th>#</th>
@@ -195,7 +172,7 @@
                 </th>
             
                 <th (click)="sortData('taskName')" class="sortable-column">
-                  Task
+                  Task Name
                   <i class="bi ms-1"
                      [ngClass]="{
                        'bi-caret-up-fill': sortColumn === 'taskName' && sortDirection === 'asc',
@@ -215,7 +192,7 @@
                 </th>
             
                 <th (click)="sortData('userName')" class="sortable-column">
-                  Assigned To
+                  Assigned User
                   <i class="bi ms-1"
                      [ngClass]="{
                        'bi-caret-up-fill': sortColumn === 'userName' && sortDirection === 'asc',
@@ -450,13 +427,21 @@
                 <div *ngIf="fileUploadError" class="text-danger mt-1">
                   {{ fileUploadError }}
                 </div>
+                <!-- Spinner shown during upload -->
+                <div *ngIf="isUploading" class="text-center mt-3">
+                 <div class="spinner-border text-primary" role="status">
+                   <span class="visually-hidden">Uploading...</span>
+                 </div>
+                <div class="mt-1 text-muted">Uploading, please wait...</div>
+              </div>
+
               </div>
             </div>
         
           </div>
         
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary" [disabled]="!selectedFile">Import</button>
+            <button type="submit" class="btn btn-primary" [disabled]="!selectedFile || isUploading">Import</button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Cancel</button>
           </div>
         </form>

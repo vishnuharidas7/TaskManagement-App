@@ -1,4 +1,3 @@
-<div class="d-flex" id="wrapper">
     <!-- Sidebar -->
     <div class="text-white p-3" id="sidebar">
       <h4>Admin Panel</h4>
@@ -8,36 +7,161 @@
         <li class="nav-item"><a class="nav-link text-white" routerLink="/adminsettings">Settings</a></li>
       </ul>
     </div>
+
+    <div class="d-flex justify-content-end align-items-center gap-2 mb-3" id="main-content">
+      <button class="btn btn-outline-primary" (click)="openModal()">
+        <i class="bi bi-plus-circle me-1" ></i> Add User
+      </button>
+    </div>
+
+    
+   <div id="main-content">
+    <div class="card">
+      <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">User Overview</h5>
+      </div>
+<!-- Filters -->
+      <div class="bg-light border rounded p-3 mb-4">
+        <h5 class="mb-3 text-secondary">🔍 Filter User</h5>
+        <form class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label">Name</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter name"
+              [(ngModel)]="filters.name"
+              name="filterUserName"
+              (ngModelChange)="applyFilters()"
+            />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">User Name</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter username"
+              [(ngModel)]="filters.username"
+              name="filterUserName"
+              (ngModelChange)="applyFilters()"
+            />
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">User Role</label>
+            <select
+              class="form-select"
+              [(ngModel)]="filters.role"
+              name="filterRole"
+              (change)="applyFilters()"
+            >
+              <option value="">All</option>
+              <option *ngFor="let role of role" [value]="role">{{ role }}</option>
+            </select>
+          </div>
+        </form>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
   
-    <!-- Page Content -->
-    <div id="page-content-wrapper" class="w-100">
-  
-      <!-- Main Content -->
-      <div class="container py-4">
-        <div class="d-flex justify-content-between align-items-center mb-3" id="main-content">
-          <h3 class="text-primary">User Management</h3>
-          <button class="btn btn-success" (click)="openModal()">
-            <i class="bi bi-plus-circle me-1"></i> Add User
-          </button>
+        <!-- Center section -->
+        <div class="mx-auto">
+          <div class="card-header bg-white border-bottom p-2 m-0 text-center">
+            <div class="text-muted">
+              Showing <strong>{{ getStartIndex() + 1 }}</strong> to 
+              <strong>{{ getEndIndex() }}</strong> of 
+              <strong>{{ filteredUser.length }}</strong> users
+            </div>
+          </div>
         </div>
-  
-        <div class="table-responsive shadow-sm border rounded">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
+      
+        <!-- Right section -->
+        <div class="d-flex align-items-center">
+          <label for="pageSizeSelect" class="me-2 mb-0">Rows per page:</label>
+          <select id="pageSizeSelect" class="form-select w-auto"
+                  [value]="pageSize"
+                  (change)="onPageSizeChange($event)">
+            <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card-body">
+        <div class="table-responsive fixed-table-container">
+          <table class="table table-striped align-middle">
+            <thead class="table-light sticky-header">
               <tr>
                 <th>#</th>
-                <th>Name</th>
-                <th>User Name</th>
-                <th>Role</th>
-                <th>Email</th>
-                <th>Phone Number</th>
-                <th>Gender</th>
-                <th>Status</th>
+                <th (click)="sortData('name')" class="sortable-column">
+                  Name
+                  <i class="bi ms-1"
+                     [ngClass]="{
+                       'bi-caret-up-fill': sortColumn === 'name' && sortDirection === 'asc',
+                       'bi-caret-down-fill': sortColumn === 'name' && sortDirection === 'desc',
+                       'bi-caret-up': sortColumn !== 'name'
+                     }"></i>
+                </th>
+                <th (click)="sortData('userName')" class="sortable-column">
+                  User Name
+                  <i class="bi ms-1"
+                     [ngClass]="{
+                       'bi-caret-up-fill': sortColumn === 'userName' && sortDirection === 'asc',
+                       'bi-caret-down-fill': sortColumn === 'userName' && sortDirection === 'desc',
+                       'bi-caret-up': sortColumn !== 'userName'
+                     }"></i>
+                </th>
+            
+                <th (click)="sortData('roleName')" class="sortable-column">
+                  Role
+                  <i class="bi ms-1"
+                     [ngClass]="{
+                       'bi-caret-up-fill': sortColumn === 'roleName' && sortDirection === 'asc',
+                       'bi-caret-down-fill': sortColumn === 'roleName' && sortDirection === 'desc',
+                       'bi-caret-up': sortColumn !== 'roleName'
+                     }"></i>
+                </th>
+                <th (click)="sortData('email')" class="sortable-column">
+                  Email
+                  <i class="bi ms-1"
+                     [ngClass]="{
+                       'bi-caret-up-fill': sortColumn === 'email' && sortDirection === 'asc',
+                       'bi-caret-down-fill': sortColumn === 'email' && sortDirection === 'desc',
+                       'bi-caret-up': sortColumn !== 'email'
+                     }"></i>
+                </th>
+                <th (click)="sortData('phoneNumber')" class="sortable-column">
+                  Phone Number
+                  <i class="bi ms-1"
+                     [ngClass]="{
+                       'bi-caret-up-fill': sortColumn === 'phoneNumber' && sortDirection === 'asc',
+                       'bi-caret-down-fill': sortColumn === 'phoneNumber' && sortDirection === 'desc',
+                       'bi-caret-up': sortColumn !== 'phoneNumber'
+                     }"></i>
+                </th>
+                <th (click)="sortData('gender')" class="sortable-column">
+                  Gender
+                  <i class="bi ms-1"
+                     [ngClass]="{
+                       'bi-caret-up-fill': sortColumn === 'gender' && sortDirection === 'asc',
+                       'bi-caret-down-fill': sortColumn === 'gender' && sortDirection === 'desc',
+                       'bi-caret-up': sortColumn !== 'gender'
+                     }"></i>
+                </th>
+                <th (click)="sortData('gender')" class="sortable-column">
+                  Status
+                  <i class="bi ms-1"
+                     [ngClass]="{
+                       'bi-caret-up-fill': sortColumn === 'status' && sortDirection === 'asc',
+                       'bi-caret-down-fill': sortColumn === 'status' && sortDirection === 'desc',
+                       'bi-caret-up': sortColumn !== 'status'
+                     }"></i>
+                </th>
                 <th class="text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let item of userList; let i = index">
+              <tr *ngFor="let item of paginatedUser; let i = index">
                 <td>{{i+1}}</td>
                 <td>{{ item.name }}</td>
                 <td>{{ item.userName }}</td>
@@ -51,23 +175,51 @@
                   </span>
                 </td>
                 <td class="text-center">
-                  <button class="btn btn-outline-success btn-sm" (click)="onEdit(item)">
-                    <i class="bi bi-pencil"></i> Edit
+                  <button class="btn btn-outline-success btn-sm me-1" (click)="onEdit(item)">
+                    <i class="bi bi-pencil"></i>View/Edit
                   </button>
-                  ||
                   <button class="btn btn-outline-danger btn-sm" (click)="onDelete(item.id)">
-                    <i class="bi bi-trash"></i> Delete
+                    <i class="bi bi-trash"></i>Delete
                   </button>
                 </td>
+              </tr>
+              <tr *ngIf="paginatedUser.length === 0">
+                <td colspan="8" class="text-center text-muted">No user found.</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-    </div>
-  </div>
+      <!-- Pagination -->
+      <div class="d-flex justify-content-center overflow-auto">
+        <nav *ngIf="totalPages > 1">
+          <ul class="pagination flex-wrap justify-content-center">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <!-- <a class="page-link" href="#" (click)="currentPage = currentPage - 1; $event.preventDefault()">Previous</a> -->
+              <a class="page-link" href="#" (click)="goToPage(currentPage - 1); $event.preventDefault()">Previous</a>
+            </li> 
 
-<!-- The Modal -->
+            <li class="page-item"
+                *ngFor="let page of [].constructor(totalPages); let pageIndex = index"
+                [class.active]="currentPage === pageIndex + 1">
+              <a class="page-link" href="#" (click)="goToPage(pageIndex + 1); $event.preventDefault()">
+                {{ pageIndex + 1 }}
+              </a>
+            </li>
+      
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <!-- <a class="page-link" href="#" (click)="currentPage = currentPage + 1; $event.preventDefault()">Next</a> -->
+              <a class="page-link" href="#" (click)="goToPage(currentPage + 1); $event.preventDefault()">Next</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+    </div>
+   </div>  
+
+
+<!-- Add User -->
 <div class="modal" id="myModal" #myModal>
     <div class="modal-dialog">
       <div class="modal-content">
@@ -186,26 +338,33 @@
       <div class="modal-body">
           <div class="row mt-3">
               <div class="col-12">
-                  <input type="text" formControlName="curpswd" name="curpswd" class="form-control" placeholder="Current password">
+                  <input type="password" formControlName="curpswd" name="curpswd" class="form-control" placeholder="Current password">
               </div>
           </div>  
             <div class="row mt-3">  
               <div class="col-12">
-                <input type="text" formControlName="newpswd" name="newpswd" class="form-control" placeholder="New Password">
+                <input type="password" formControlName="newpswd" name="newpswd" class="form-control" placeholder="New Password">
               </div>
             </div>  
-            <div class="row mt-3">
-              <div class="col-12">
-               <input type="text" formControlName="confrmNewpswd" name="confrmNewpswd" class="form-control" placeholder="Confirm New Password">
-              <div class="text-danger mt-1" *ngif="pswdForm.errors?.passwordMismatch && pswdForm.touched ">Password do not match</div>
+           <!-- Confirm Password Field -->
+           <div class="row mt-3">
+             <div class="col-12">
+               <input type="password" formControlName="confrmNewpswd" class="form-control" placeholder="Confirm New Password">
+               <div *ngIf="pswdForm.hasError('passwordMismatch') && pswdForm.get('confrmNewpswd')?.touched" class="text-danger mt-1">
+                 Passwords do not match.
+               </div>
               </div>
-            </div>
+           </div>
+
       </div>
 
       <!-- Modal footer -->
       <div class="modal-footer">
          
-          <button type="submit" class="btn btn-success" data-bs-dismiss="modal" (click)="updatePassword()">Update</button>
+          <!-- <button type="submit" class="btn btn-success" (click)="updatePassword()">Update</button> -->
+          <button type="submit" class="btn btn-success" [disabled]="pswdForm.invalid" (click)="updatePassword()">Update</button>
+
+
       
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="closePswdModel()">Close</button>
       </div>
