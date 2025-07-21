@@ -58,7 +58,8 @@ filters = {
   date: '',
   status: '',
   priority: '',
-  taskId :''
+  taskId :'',
+  taskNames:''
 };
 
 status: string[] = ['New', 'Due', 'OverDue', 'Completed']; 
@@ -90,7 +91,7 @@ sortData(column: string): void {
 
 
 applyFilters(): void {
-  const { name, type, date, status, priority ,taskId } = this.filters;
+  const { name, type, date, status, priority ,taskId,taskNames } = this.filters;
 
   this.filteredTasks = this.allTasks.filter(task => {
     const matchesName = name ? task.userName.toLowerCase().includes(name.toLowerCase()) : true;
@@ -99,8 +100,9 @@ applyFilters(): void {
     const matchesStatus = status ? task.taskState === status : true;
     const matchesPriority = priority ? task.priority === priority : true;
     const matchesReferenceId = taskId ? task.referenceId?.toLowerCase().includes(taskId.toLowerCase()) : true;
+    const matchesTaskName=taskNames? task.taskName?.toLocaleLowerCase().includes(taskNames.toLocaleLowerCase()):true;
 
-    return matchesName && matchesType && matchesDate && matchesStatus && matchesPriority&&matchesReferenceId;
+    return matchesName && matchesType && matchesDate && matchesStatus && matchesPriority&&matchesReferenceId&&matchesTaskName;
   });
 
   if (this.sortColumn) {
@@ -271,6 +273,7 @@ goToPage(page: number): void {
   }
 
   getTasks() {
+    debugger
     // this.taskService.getAllTasks().subscribe({
     //   next: (res) => {
     //     this.tasks = res;
@@ -308,16 +311,20 @@ goToPage(page: number): void {
   
 
   toDateInputFormat(date: any): string {
-    return new Date(date).toISOString().split('T')[0];
+    debugger
+    return date.split('T')[0];
   }
   
 
   onEdit(Task:Tasks)
   {
+    debugger
+    console.log("Task object:", Task);
     this.openModal();
     this.taskForm.patchValue({ ...Task,
       dueDate: this.toDateInputFormat(Task.dueDate)});
       this.getTasks();
+
   }
 
   get dueDateControl()
@@ -381,6 +388,7 @@ get fileuploadControl()
       });
       }
      else{
+      debugger
       this.taskService.updateTask(this.formValue).subscribe({
         next: () => {
           alert('Task Updated Successfully....');
