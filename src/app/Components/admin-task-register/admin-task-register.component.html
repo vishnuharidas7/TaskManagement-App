@@ -14,7 +14,7 @@
       <i class="bi bi-plus-circle me-1" ></i> Create Task
     </button>
     <button class="btn btn-outline-secondary" (click)="openModal1()">
-      <i class="bi bi-upload me-1"></i> Upload Task
+      <i class="bi bi-upload me-1"></i> Import Task
     </button>
   </div>
   
@@ -405,7 +405,7 @@
   
         <!-- Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">Upload Task</h4>
+          <h4 class="modal-title">Import Task</h4>
           <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="closeModal()"></button>
         </div>
         <form [formGroup]="fileUploadForm" (ngSubmit)="onFileUpload()">
@@ -415,12 +415,14 @@
             <div class="row">
               <div class="col-12">
                 <label for="fileInput" class="form-label">Upload File</label>
+                <ng-container *ngIf="showFileInput">
                 <input
                   type="file"
                   id="fileInput"
+                  #fileInputref
                   class="form-control"
                   (change)="onFileSelected($event)"
-                  accept="*/*" />
+                  accept="*/*" /> </ng-container>
         
                 <div *ngIf="fileUploadError" class="text-danger mt-1">
                   {{ fileUploadError }}
@@ -439,7 +441,7 @@
           </div>
         
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary" [disabled]="!selectedFile || isUploading">Upload</button>
+            <button type="submit" class="btn btn-primary" [disabled]="!selectedFile || isUploading">Import</button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Cancel</button>
           </div>
         </form>
