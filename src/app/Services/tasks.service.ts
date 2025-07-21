@@ -58,8 +58,10 @@ export class TasksService {
   }
   
 
-  uploadTask(fileData: FormData): Observable<string> {
-    return this.http.post(this.uploadTaskAPIUrl, fileData, {
+  uploadTask(fileData: FormData, userId: number): Observable<string> {
+    return this.http.post(
+      //this.uploadTaskAPIUrl
+      `${this.uploadTaskAPIUrl}?userId=${userId}`, fileData, {
       responseType: 'text' as const  
     });
   }
