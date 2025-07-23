@@ -26,3 +26,5 @@
    li:hover{
      background-color: rgb(200, 158, 145);
    }
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
