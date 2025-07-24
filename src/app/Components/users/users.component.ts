@@ -8,11 +8,12 @@ import { RouterLink} from '@angular/router';
 import { LoggerServiceService } from '../../Services/logger-service.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,RouterLink,FormsModule,MatSelectModule,MatFormFieldModule],
+  imports: [CommonModule, ReactiveFormsModule,RouterLink,FormsModule,MatSelectModule,MatFormFieldModule, MatSlideToggleModule],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css'
 })
@@ -27,6 +28,18 @@ userForm : FormGroup = new FormGroup({});
 pswdForm: FormGroup = new FormGroup({});
 private readonly JWT_TOKEN = 'JWT_TOKEN';
 constructor(private fb: FormBuilder,private logger:LoggerServiceService,private errorHandler:ErrorHandler){}
+
+// onStatusToggle(event: any): void {
+//   const isActive = event.checked; // true or false
+//   this.userForm.get('userStatus')?.setValue(isActive ? 1 : 0);
+// }
+
+onStatusToggle(event: any): void {
+  const isActive = event.checked; // already true or false
+  this.userForm.get('isActive')?.setValue(isActive); // ✅ set as boolean
+}
+
+
 formValue: any;
 
 filters = {
@@ -119,6 +132,11 @@ goToPage(page: number): void {
   this.updatePaginatedTasks();
 }
 
+// onStatusToggle(event: MatSlideToggleChange): void {
+//   this.userForm.get('userStatus')?.setValue(event.checked ? 1 : 2);
+// }
+
+
   openModal()
   {
     const userModel = document.getElementById('myModal');
@@ -181,7 +199,8 @@ get userNameControl()
       //password: ['',[Validators.required]],
       roleid: ['',[Validators.required]],
       phoneNumber: ['',[Validators.required, Validators.maxLength(10), Validators.minLength(10),Validators.pattern(/^[0-9]{10}$/)]],
-      gender: ['',Validators.required]
+      gender: ['',Validators.required],
+      isActive:[true]
     });
   }
 
@@ -266,9 +285,12 @@ get userNameControl()
       //User
       {
         ...user,
-        roleid: Number(user.roleId)
+        roleid: Number(user.roleId),
+        isActive: Number(user.status)
       });
   }
+
+  
 
   onDelete(id: number) {
     const isConfirm = confirm("Are you sure you want to delete this User?");

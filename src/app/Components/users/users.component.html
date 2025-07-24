@@ -171,7 +171,7 @@
                 <td>{{ item.gender }}</td>
                 <td>
                   <span class="badge" [ngClass]="item.status ? 'bg-success' : 'bg-secondary'">
-                    {{ item.status ? 'Active' : 'Inactive' }}
+                    {{ item.status ? 'Active' : 'De-Active' }}
                   </span>
                 </td>
                 <td class="text-center">
@@ -331,7 +331,33 @@
                     </mat-select>
                   </mat-form-field>
             </div>
+            <div class="col-6">      
+              @if(userForm.value.id != 0)
+                {
+                  <label for="userStatus" class="form-label"  style="margin-left: 10px;">Account Status</label>  
+                <div class="toggle-container" [formGroup]="userForm">
+                  <mat-slide-toggle
+                    formControlName="isActive"
+                    [checked]="userForm.value.isActive == 1"
+                    (change)="onStatusToggle($event)"
+                    class="custom-slide-toggle"
+                  ></mat-slide-toggle>
+              
+                  <!-- Status label outside the toggle -->
+                  <span
+                    class="status-label"
+                    [ngClass]="{
+                      'active-label': userForm.value.isActive == true,
+                      'deactive-label': userForm.value.isActive == false
+                    }"
+                  >
+                    {{ userForm.value.isActive == 1 ? 'Active' : 'De-Active' }}
+                  </span>
+                </div>
+                }            
+           </div>
          </div>
+         
         </div>
   
         <!-- Modal footer -->
