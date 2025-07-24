@@ -5,7 +5,12 @@ import { TasksService } from '../../Services/tasks.service';
 import { FormGroup, FormsModule,FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Tasks } from '../../Models/tasks';
 import { LoggerServiceService } from '../../Services/logger-service.service';
-
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
 interface User {
   id: number;
   name: string;
@@ -16,7 +21,11 @@ interface User {
 
 @Component({
   selector: 'app-admin-task-register',
-  imports: [CommonModule,ReactiveFormsModule, RouterOutlet, RouterLink, FormsModule],
+  imports: [CommonModule,ReactiveFormsModule, RouterOutlet, RouterLink, FormsModule,MatProgressSpinnerModule, MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatIconModule],
   templateUrl: './admin-task-register.component.html',
   styleUrl: './admin-task-register.component.css'
 })

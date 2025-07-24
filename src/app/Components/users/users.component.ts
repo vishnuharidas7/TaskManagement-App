@@ -6,12 +6,14 @@ import { CommonModule } from '@angular/common';
 import { combineLatest, debounceTime, first, map, switchMap,of } from 'rxjs';
 import { RouterLink} from '@angular/router';
 import { LoggerServiceService } from '../../Services/logger-service.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,RouterLink,FormsModule, MatSlideToggleModule],
+  imports: [CommonModule, ReactiveFormsModule,RouterLink,FormsModule,MatSelectModule,MatFormFieldModule, MatSlideToggleModule],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css'
 })

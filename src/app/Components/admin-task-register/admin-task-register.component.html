@@ -342,14 +342,33 @@
              <div>
                 <div class="row mt-3">
                     <div class="col-12">
-                        <input type="date" formControlName="dueDate"  name="dueDate" class="form-control" placeholder="Due Date">
+                        <!-- <input type="date" formControlName="dueDate"  name="dueDate" class="form-control" placeholder="Due Date">
                         <div *ngIf="dueDateControl?.hasError('pastDate') && dueDateControl?.touched" class="text-danger">
                           Due date cannot be in the past.
                         </div>
                       
                         <div *ngIf="dueDateControl?.hasError('required') && dueDateControl?.touched" class="text-danger">
                           Due date is required.
-                        </div>
+                        </div> -->
+                        <mat-form-field appearance="fill" class="w-100 mt-3">
+                          <mat-label>Due Date</mat-label>
+                          <input
+                            matInput
+                            [matDatepicker]="picker"
+                            formControlName="dueDate"
+                            placeholder="MM/DD/YYYY"
+                          />
+                          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                          <mat-datepicker #picker></mat-datepicker>
+                        
+                          <!-- Validation messages -->
+                          <mat-error *ngIf="dueDateControl?.hasError('pastDate') && dueDateControl?.touched">
+                            Due date cannot be in the past.
+                          </mat-error>
+                          <mat-error *ngIf="dueDateControl?.hasError('required') && dueDateControl?.touched">
+                            Due date is required.
+                          </mat-error>
+                        </mat-form-field>
                     </div>
                 </div>
              </div> 
@@ -429,9 +448,7 @@
                 </div>
                 <!-- Spinner shown during upload -->
                 <div *ngIf="isUploading" class="text-center mt-3">
-                 <div class="spinner-border text-primary" role="status">
-                   <span class="visually-hidden">Uploading...</span>
-                 </div>
+                  <mat-spinner [diameter]="40" [strokeWidth]="3"></mat-spinner>
                 <div class="mt-1 text-muted">Uploading, please wait...</div>
               </div>
 
