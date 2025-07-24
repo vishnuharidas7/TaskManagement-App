@@ -6,11 +6,13 @@ import { CommonModule } from '@angular/common';
 import { combineLatest, debounceTime, first, map, switchMap,of } from 'rxjs';
 import { RouterLink} from '@angular/router';
 import { LoggerServiceService } from '../../Services/logger-service.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,RouterLink,FormsModule],
+  imports: [CommonModule, ReactiveFormsModule,RouterLink,FormsModule,MatSelectModule,MatFormFieldModule],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css'
 })
