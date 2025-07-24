@@ -28,3 +28,9 @@
    }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Ensure Angular Material datepicker popup appears above Bootstrap modals */
+.cdk-overlay-container {
+  z-index: 1056 !important; /* Bootstrap modal is 1055, so this must be higher */
+}
+

@@ -288,22 +288,48 @@
                   </div>
             </div>
             <div class="col-6">
-                <select formControlName="gender" class="form-control" id="gender" autocomplete="off">
+                <!-- <select formControlName="gender" class="form-control" id="gender" autocomplete="off">
                     <option Value="" disabled>Select Gender</option>
                     <option Value="Male">Male</option>
                     <option Value="Female">Female</option>
                     <option Value="Other">Other</option>
-                  </select>
+                  </select> -->
+                  <!-- <mat-form-field appearance="fill" style="width: 100%;">
+                    <mat-label>Gender</mat-label>
+                    <mat-select  formControlName="gender" autocomplete="off">
+                      <mat-option Value="" disabled>Select Gender</mat-option>
+                      <mat-option [Value]="Male">Male</mat-option>
+                      <mat-option [Value]="Female">Female</mat-option>
+                      <mat-option [Value]="Other">Other</mat-option>
+                    </mat-select>
+                  </mat-form-field> -->
+                  <mat-form-field appearance="fill" style="width: 100%;">
+                    <mat-label>Gender</mat-label>
+                    <mat-select formControlName="gender" placeholder="Select Gender" autocomplete="off">
+                      <mat-option value="" disabled>Select Gender</mat-option>
+                      <mat-option value="Male">Male</mat-option>
+                      <mat-option value="Female">Female</mat-option>
+                      <mat-option value="Other">Other</mat-option>
+                    </mat-select>
+                  </mat-form-field>
             </div>
         </div>
          <div class="row mt-3">
             <div class="col-6"> 
-                <label for="roleid" class="form-label"  style="margin-left: 10px;">Role</label>
+                <!-- <label for="roleid" class="form-label"  style="margin-left: 10px;">Role</label>
                 <select formControlName="roleid" class="form-control" id="roleid" autocomplete="off">
                     <option [value]="" disabled>Select Role</option>
                     <option [value]="1">Admin</option>
                     <option [value]="2">User</option>
-                  </select>
+                  </select> -->
+                  <mat-form-field appearance="fill" style="width: 100%;">
+                    <mat-label>Role</mat-label>
+                    <mat-select formControlName="roleid" autocomplete="off">
+                      <mat-option value="" disabled>Select Role</mat-option>
+                      <mat-option [value]="1">Admin</mat-option>
+                      <mat-option [value]="2">User</mat-option>
+                    </mat-select>
+                  </mat-form-field>
             </div>
             <div class="col-6">      
               @if(userForm.value.id != 0)
