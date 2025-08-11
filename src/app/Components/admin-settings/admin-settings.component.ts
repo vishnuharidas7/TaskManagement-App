@@ -157,6 +157,9 @@ get userNameControl()
       );
     };
   }
+  reloadPage(){
+    window.location.reload();
+  }
 
 updateUser(){ 
   console.log(this.adminFormSettings.value);
@@ -172,7 +175,8 @@ updateUser(){
         this.logger.info('User updated successfully');
         this.getUserByid();
         this.adminFormSettings.reset();
-        window.location.reload();
+        this.reloadPage();
+        //window.location.reload();
       },
       error: (err) => {
         console.error('Failed to update user', err);
@@ -239,7 +243,8 @@ updatePassword(){
       this.pswdForm.reset();
       this.pswdSubmitted = false;
       this.closePswdModel();
-      window.location.reload();
+      this.reloadPage();
+      //window.location.reload();
     },
     error:(err)=>{
       this.pswdSubmitted = true;

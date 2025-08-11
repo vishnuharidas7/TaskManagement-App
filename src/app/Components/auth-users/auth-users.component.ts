@@ -7,7 +7,7 @@ import { LoggerServiceService } from '../../Services/logger-service.service';
 
 @Component({
   selector: 'app-auth-users',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule],
   templateUrl: './auth-users.component.html',
   styleUrl: './auth-users.component.css'
 })

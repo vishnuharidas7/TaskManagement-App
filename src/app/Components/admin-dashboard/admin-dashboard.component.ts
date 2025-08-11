@@ -39,16 +39,7 @@ export class AdminDashboardComponent implements OnInit {
   taskCount:number=0;
 
 //Pagination 
-// currentPage: number = 1;
-// pageSize: number = 5;
-// get paginatedTasks() {
-//   const start = (this.currentPage - 1) * this.pageSize;
-//   return this.taskLists.slice(start, start + this.pageSize);
-// }
-
-// get totalPages(): number {
-//   return Math.ceil(this.taskLists.length / this.pageSize);
-// }
+ 
 pageSizeOptions: number[] = [5, 10, 20, 50, 100];
 pageSize: number = 5;
 currentPage: number = 1;
@@ -65,7 +56,7 @@ get totalPages(): number {
 onPageSizeChange(event: Event) {
   const selectedValue = (event.target as HTMLSelectElement).value;
   this.pageSize = parseInt(selectedValue, 10);
-  this.currentPage = 1; // Reset to first page when page size changes
+  this.currentPage = 1;  
 }
 
 
@@ -76,7 +67,6 @@ onPageSizeChange(event: Event) {
     { title: 'Total Tasks', count: 0 },
     { title: 'Completed Tasks', count: 0 },
     { title: 'Pending Tasks', count: 0 },
-    //{ title: 'Total Users', count:0}
     {title: 'New Tasks', count:0}
   ];
 
@@ -121,11 +111,7 @@ onPageSizeChange(event: Event) {
     this.userService.getAllUsers().subscribe({
       next: (res) => {
         this.userList = res;
-        this.userCount = res.length;
-        // const totalUsersStat = this.stats.find(stat => stat.title === 'Total Users');
-        // if (totalUsersStat) {
-        //   totalUsersStat.count = this.userCount;
-        // }
+        this.userCount = res.length; 
       },
       error: (err) => {
         this.logger.error("Failed to load user list", err); 
@@ -135,18 +121,6 @@ onPageSizeChange(event: Event) {
     });
   }
 
-
-//  getTask(){
-//   this.taskService.getAllTasks().subscribe((res)=>{
-//     this.taskLists=res;
-//     this.taskCount=res.length;
-//     const totalTaskStat=this.stats.find(stat=>stat.title=='Total Tasks');
-//     if(totalTaskStat)
-//     {
-//       totalTaskStat.count=this.taskCount;
-//     }
-//   });
-//  }
  
 getTask(){
   this.taskService.getAllTasks().subscribe({next:(res)=>{this.taskLists=res;this.taskCount=res.length;
@@ -189,35 +163,7 @@ getTask(){
   logout(){
     this.authService.logout();
   }
-
-  // getUserInformationFromToken(): {userId:number,role:string} | null {
-  //   const token = sessionStorage.getItem(this.JWT_TOKEN);
-  //   //const token = localStorage.getItem('token');  // or wherever you store it
   
-  //   if (!token) return null;
-  
-  //   try {
-  //     // JWT format: header.payload.signature
-  //     const payloadBase64 = token.split('.')[1];
-  //     const payloadJson = atob(payloadBase64);
-  //     const payload = JSON.parse(payloadJson);
-  
-  //     // Extract the userId from the specific claim
-  //     const userIdString = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
-  //     const roleString = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-      
-  //     if (!userIdString || !roleString) return null;
-  
-  //     return{
-  //       userId:parseInt(userIdString,10),
-  //       role:roleString
-  //     }
-  
-  //   } catch (error) {
-  //     console.error('Error parsing JWT token:', error);
-  //     return null;
-  //   }
-  // }
 
   loadNotification(){
     this.taskService.getTaskNotificationAdmin().subscribe({
@@ -231,8 +177,7 @@ getTask(){
 
   getUserInfoFromToken(): {userId:number;roleId:number}|null {
     const token = sessionStorage.getItem(this.JWT_TOKEN);
-    //const token = localStorage.getItem('token');  // or wherever you store it
-  
+    
     if (!token) return null;
   
     try {
@@ -273,8 +218,7 @@ getTask(){
       name: ['',[Validators.required]],
       userName: ['',[Validators.required,], [this.UsernameExistsValidator()]],
       email: ['',[Validators.required, Validators.email,
-        // Validators.pattern('^[a-zA-Z0-9._%+-]+@example\\.com$')
-        Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$') 
+      Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$') 
         ]],
       password: ['',[Validators.required]],
       roleid: this.getUserInfoFromToken()?.roleId,
@@ -344,6 +288,10 @@ getTask(){
     };
   }
 
+  reloadPage() {
+    window.location.reload();
+  }
+
   updateUser(){ 
     console.log(this.userFormSettings.value);
     if(this.userFormSettings.invalid)
@@ -359,7 +307,7 @@ getTask(){
           this.getUserByid();
           this.userFormSettings.reset();
           this.closeGotoSettingModal();
-          window.location.reload();
+          this.reloadPage();
         },
         error: (err) => {
           console.error('Failed to update user', err);
@@ -429,7 +377,7 @@ getTask(){
       newpswd: ['',[Validators.required]],
       confrmNewpswd: ['',[Validators.required]]
 
-    },{Validators:this.passwordsMatchValidator()} );
+    },{validators:this.passwordsMatchValidator()} );
   }
 
 
