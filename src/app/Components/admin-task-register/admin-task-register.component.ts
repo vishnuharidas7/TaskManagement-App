@@ -282,8 +282,7 @@ goToPage(page: number): void {
     });
   }
 
-  getTasks() {
-    debugger
+  getTasks() { 
     // this.taskService.getAllTasks().subscribe({
     //   next: (res) => {
     //     this.tasks = res;
@@ -360,8 +359,10 @@ get fileuploadControl()
       taskDescription:['',Validators.required] ,
       taskType:['',Validators.required],
       priority:['',Validators.required],
-      userName: ['Ram'],
+      userName: [''],
       taskStatus:[''],
+      taskState:[''],
+      referenceId:[''],
       createdBy:createdbyID?.userId 
     });
 
