@@ -85,6 +85,7 @@ applyFilters(): void {
     const matchesRole = role ? user.roleName === role : true;
     return matchesUserName&& matchesName && matchesRole;
   });
+
   if (this.sortColumn) {
     this.filteredUser.sort((a: any, b: any) => {
       const valueA = a[this.sortColumn];
@@ -101,7 +102,7 @@ applyFilters(): void {
 
   this.totalPages = Math.ceil(this.filteredUser.length / this.pageSize);
   this.currentPage = 1; // reset to first page
-  this.updatePaginatedTasks();
+  this.updatePaginatedUsers();
 }
 getStartIndex(): number {
   return (this.currentPage - 1) * this.pageSize;
@@ -122,14 +123,14 @@ updatePaginatedUsers(): void {
   const end = start + this.pageSize;
   this.paginatedUser = this.filteredUser.slice(start, end);
 }
-updatePaginatedTasks(): void {
-  const start = (this.currentPage - 1) * this.pageSize;
-  const end = start + this.pageSize;
-  this.paginatedUser = this.filteredUser.slice(start, end);
-}
+// updatePaginatedTasks(): void {
+//   const start = (this.currentPage - 1) * this.pageSize;
+//   const end = start + this.pageSize;
+//   this.paginatedUser = this.filteredUser.slice(start, end);
+// }
 goToPage(page: number): void {
   this.currentPage = page;
-  this.updatePaginatedTasks();
+  this.updatePaginatedUsers();
 }
 
 // onStatusToggle(event: MatSlideToggleChange): void {
