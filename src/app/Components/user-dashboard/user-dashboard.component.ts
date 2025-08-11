@@ -7,7 +7,7 @@ import { TasksService } from '../../Services/tasks.service';
 import { jwtDecode } from 'jwt-decode';
 import { LoggerServiceService } from '../../Services/logger-service.service';
 import { NotificationTask } from '../../Models/notificationTask';
-import { interval,Subscription } from 'rxjs';
+import { interval,Observable,Subscription } from 'rxjs';
 import { timer } from 'rxjs';
 import { UsersService } from '../../Services/users.service';
 import { Users } from '../../Models/users';
@@ -26,7 +26,7 @@ export class UserDashboardComponent {
 @ViewChild('passwordModal') passwordModal : ElementRef | undefined;
 
 private readonly JWT_TOKEN = 'JWT_TOKEN';
-private notificationSubscription?: Subscription;
+public notificationSubscription?: Subscription;
 notificationDropdownVisible=false;
 orginalUserName:string='';
 
@@ -66,6 +66,9 @@ orginalUserName:string='';
   totalPages: number = 1;
   pageSizeOptions: number[] = [5, 10, 20, 50, 100];
   
+
+  constructor(private authService: UserAuthService, private fb:FormBuilder,private logger:LoggerServiceService,private errorHandler:ErrorHandler,private userService:UsersService) {}
+
   applyFilters(): void {
     const { date, type, status, priority,taskId,taskNames } = this.filters;
   
@@ -109,7 +112,6 @@ orginalUserName:string='';
 
   //Ends here
 
-  constructor(private authService: UserAuthService, private fb:FormBuilder,private logger:LoggerServiceService,private errorHandler:ErrorHandler,private userService:UsersService) {}
 
   ngOnInit(): void {
     //this.loadUserTasks();
@@ -143,13 +145,19 @@ orginalUserName:string='';
   }
 
   
-  openModal(){
-    const createTask = document.getElementById('myModal');
-    if(createTask != null)
-    {
-      createTask.style.display= 'block';
+  // openModal(){
+  //   const createTask = document.getElementById('myModal');
+  //   if(createTask != null)
+  //   {
+  //     createTask.style.display= 'block';
+  //   }
+  // }
+  openModal() {
+    if (this.model?.nativeElement) {
+      this.model.nativeElement.style.display = 'block';
     }
   }
+  
 
   closeModal()
   {
@@ -427,7 +435,10 @@ orginalUserName:string='';
    }
  
 
-
+   reloadWindow(): void {
+    window.location.reload();
+  }
+  
    updateUser(){ 
     console.log(this.userFormSettings.value);
     if(this.userFormSettings.invalid)
@@ -443,7 +454,7 @@ orginalUserName:string='';
           this.getUserByid();
           this.userFormSettings.reset();
           this.closeGotoSettingModal();
-          window.location.reload();
+          this.reloadWindow();
         },
         error: (err) => {
           console.error('Failed to update user', err);
@@ -499,20 +510,35 @@ orginalUserName:string='';
 
   }
 
-  UsernameExistsValidator(): AsyncValidatorFn {
-    return (control: AbstractControl) => {
-      if(control.value===this.orginalUserName){
-        return of(null);
+  // UsernameExistsValidator(): AsyncValidatorFn {
+  //   return (control: AbstractControl) => {
+  //     if(control.value===this.orginalUserName){
+  //       return of(null);
 
+  //     }
+  //     return control.valueChanges.pipe(
+  //       debounceTime(300),
+  //       switchMap(username => this.userService.checkUsernameExists(username)),
+  //       map(exists => (exists ? { usernameTaken: true } : null)),
+  //       first()
+  //     );
+  //   };
+  // }
+  UsernameExistsValidator(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      if (control.value === this.orginalUserName) {
+        return of(null);
       }
-      return control.valueChanges.pipe(
+  
+      return this.userService.checkUsernameExists(control.value).pipe(
         debounceTime(300),
-        switchMap(username => this.userService.checkUsernameExists(username)),
-        map(exists => (exists ? { usernameTaken: true } : null)),
+        map((exists: boolean) => (exists ? { usernameTaken: true } : null)),
         first()
       );
     };
   }
+  
+  
 
   openPassswordModel()
   {

@@ -18,7 +18,7 @@ export class UserSettingsComponent implements OnInit {
   @ViewChild('passwordModal') passwordModal : ElementRef | undefined;
 
   userFormSettings : FormGroup = new FormGroup({});
-  private readonly JWT_TOKEN = 'JWT_TOKEN';
+  public readonly JWT_TOKEN = 'JWT_TOKEN';
   orginalUserName:string='';
   userByid:Users|null=null;
   formValue: any;
@@ -29,15 +29,10 @@ export class UserSettingsComponent implements OnInit {
     private errorHandler:ErrorHandler,private logger:LoggerServiceService) {}
 
   ngOnInit() {
-    this.setFormStateSettings();
+    this.setFormStateSettings();  
     this.getUserByid();
     this.setPswdFormState();
-
- 
   }
-
-
-
 
   logout(){
     this.authService.logout();
@@ -150,6 +145,11 @@ export class UserSettingsComponent implements OnInit {
     });
   }
 
+  reloadPage() {
+    window.location.reload();
+  }
+  
+
   updateUser(){ 
     console.log(this.userFormSettings.value);
     if(this.userFormSettings.invalid)
@@ -164,7 +164,7 @@ export class UserSettingsComponent implements OnInit {
           this.logger.info('User updated successfully');
           this.getUserByid();
           this.userFormSettings.reset();
-          window.location.reload();
+          this.reloadPage();
         },
         error: (err) => {
           console.error('Failed to update user', err);
@@ -185,13 +185,32 @@ export class UserSettingsComponent implements OnInit {
 
   },{Validators:this.passwordsMatchValidator()} );
 }
+
+
+// passwordsMatchValidator(): ValidatorFn {
+//   return (group: AbstractControl): {[key: string]: any} | null => {
+//     const newPassword = group.get('newpswd')?.value;
+//     const confirmPassword = group.get('confrmNewpswd')?.value;
+//     return newPassword === confirmPassword ? null : { passwordMismatch: true };
+//   };
+// }
 passwordsMatchValidator(): ValidatorFn {
-  return (group: AbstractControl): {[key: string]: any} | null => {
-    const newPassword = group.get('newpswd')?.value;
-    const confirmPassword = group.get('confrmNewpswd')?.value;
+  return (group: AbstractControl): { [key: string]: any } | null => {
+    const newPasswordControl = group.get('newpswd');
+    const confirmPasswordControl = group.get('confrmNewpswd');
+
+    if (!newPasswordControl || !confirmPasswordControl) {
+      // If either control is missing, skip validation (return null)
+      return null;
+    }
+
+    const newPassword = newPasswordControl.value;
+    const confirmPassword = confirmPasswordControl.value;
+
     return newPassword === confirmPassword ? null : { passwordMismatch: true };
   };
 }
+
 
   openPassswordModel(){
     //this.pswdForm.patchValue({id:user.id})
@@ -211,6 +230,7 @@ passwordsMatchValidator(): ValidatorFn {
      }
    }
 
+
    updatePassword(){
     if(this.pswdForm.invalid){
       alert('Please fill in all fields and ensure passwords match.')
@@ -224,7 +244,7 @@ passwordsMatchValidator(): ValidatorFn {
         this.pswdForm.reset();
         this.pswdSubmitted = true;
         this.closePswdModel();
-        window.location.reload();
+        this.reloadPage();
       },
       error:(err)=>{
         this.pswdSubmitted = true;
