@@ -172,7 +172,8 @@ updateUser(){
     this.userService.updateUser(this.formValue).subscribe({
       next: (res) => {
         alert('User Updated Successfully....');
-        this.logger.info('User updated successfully');
+        //this.logger.info('User updated successfully');
+        console.info('User updated successfully');
         this.getUserByid();
         this.adminFormSettings.reset();
         this.reloadPage();
@@ -180,7 +181,8 @@ updateUser(){
       },
       error: (err) => {
         console.error('Failed to update user', err);
-        this.logger.error('Failed to update user', err);
+        //this.logger.error('Failed to update user', err);
+        console.error('Failed to update user', err)
         this.errorHandler.handleError(err);
         alert('Failed to update user. Please try again later.');
       }
@@ -249,7 +251,8 @@ updatePassword(){
     error:(err)=>{
       this.pswdSubmitted = true;
       console.error('Failed to update user', err);
-      this.logger.error('Failed to update user', err);
+      //this.logger.error('Failed to update user', err);
+      console.error('Failed to update user', err)
       this.errorHandler.handleError(err);
       alert('Failed to update user. Please try again later.');
     }

@@ -114,7 +114,8 @@ onPageSizeChange(event: Event) {
         this.userCount = res.length; 
       },
       error: (err) => {
-        this.logger.error("Failed to load user list", err); 
+        //this.logger.error("Failed to load user list", err); 
+        console.error("Failed to load user list", err)
         this.errorHandler.handleError(err); 
         alert("Failed to load users.");
       }
@@ -153,7 +154,8 @@ getTask(){
 
   },
   error:(err)=>{
-    this.logger.error("Failed to load task list",err);
+    //this.logger.error("Failed to load task list",err);
+    console.error("Failed to load task list",err);
     this.errorHandler.handleError(err);
     alert("Faild to load tasks.")
   }       
@@ -303,7 +305,8 @@ getTask(){
       this.userService.updateUser(this.formValue).subscribe({
         next: (res) => {
           alert('User Updated Successfully....');
-          this.logger.info('User updated successfully');
+          //this.logger.info('User updated successfully');
+          console.info("User updated successfully");
           this.getUserByid();
           this.userFormSettings.reset();
           this.closeGotoSettingModal();
@@ -311,7 +314,8 @@ getTask(){
         },
         error: (err) => {
           console.error('Failed to update user', err);
-          this.logger.error('Failed to update user', err);
+          //this.logger.error('Failed to update user', err);
+          console.error('Failed to update user', err);
           this.errorHandler.handleError(err);
           alert('Failed to update user. Please try again later.');
         }
@@ -396,7 +400,8 @@ getTask(){
       },
       error:(err)=>{
         console.error('Failed to update user', err);
-        this.logger.error('Failed to update user', err);
+       // this.logger.error('Failed to update user', err);
+       console.error("Failed to update user",err);
         this.errorHandler.handleError(err);
         alert('Failed to update user. Please try again later.');
       }

@@ -167,7 +167,8 @@ getUser()
       this.applyFilters();
     },
     error: (err) => {
-      this.logger.error("Failed to fetch User", err);         
+      //this.logger.error("Failed to fetch User", err);   
+      console.error("Failed to fetch User", err);      
       this.errorHandler.handleError(err);                     
       alert("Unable to load User. Please try again later.");  
     }
@@ -241,7 +242,8 @@ get userNameControl()
           console.log('Error status:', error.status);
           console.log('Error response:', error.error);
           console.error("User add failed:", error);
-          this.logger.error("User add failed:", error);
+          //this.logger.error("User add failed:", error);
+          console.error("User add failed:", error);
   
           // ✅ Alert backend error message
           const errorMessage = error.error?.message || error.error?.error || error.message || 'Something went wrong.';
@@ -259,14 +261,16 @@ get userNameControl()
       this.userService.updateUser(this.formValue).subscribe({
         next: (res) => {
           alert('User Updated Successfully....');
-          this.logger.info('User updated successfully');
+          //this.logger.info('User updated successfully');
+          console.info('User updated successfully');
           this.getUser();
           this.userForm.reset();
           this.closeModal();
         },
         error: (err) => {
           console.error('Failed to update user', err);
-          this.logger.error('Failed to update user', err);
+          //this.logger.error('Failed to update user', err);
+          console.error('Failed to update user', err);
           this.errorHandler.handleError(err);
   
           // ✅ Alert backend error message
@@ -299,13 +303,15 @@ get userNameControl()
       this.userService.deleteUser(id).subscribe({
         next: () => {
           alert("User deleted successfully.");
-          this.logger.info(`User with ID ${id} deleted.`);
+          //this.logger.info(`User with ID ${id} deleted.`);
+          console.info(`User with ID ${id} deleted.`);
           this.getUser();
         },
         error: (err) => {
           debugger
           console.error("Failed to delete user", err);
-          this.logger.error("Failed to delete user", err);
+          //this.logger.error("Failed to delete user", err);
+          console.error("Failed to delete user", err);
           this.errorHandler.handleError(err);
 
           if(err.status===400 && err.error?.detail){
@@ -377,7 +383,8 @@ get userNameControl()
       },
       error:(err)=>{
         console.error('Failed to update user', err);
-        this.logger.error('Failed to update user', err);
+        //this.logger.error('Failed to update user', err);
+        console.error('Failed to update user', err);
         this.errorHandler.handleError(err);
         alert('Failed to update user. Please try again later.');
       }

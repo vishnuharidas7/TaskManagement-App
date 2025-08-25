@@ -39,7 +39,8 @@ export class AuthUsersComponent {
         const role = sessionStorage.getItem('user_role');
         console.log("User role:", role);
         // alert("Login Successfully");
-        this.logger.info("UI-Login successfully");
+        //this.logger.info("UI-Login successfully");
+        console.info("UI-Login successfully");
   
         setTimeout(() => {
           this.isLoading = false;
@@ -52,7 +53,8 @@ export class AuthUsersComponent {
       },
       error: (err) => {
         console.error("Login Failed:", err);
-        this.logger.error("Login failed", err);
+        //this.logger.error("Login failed", err);
+        console.error("Login failed", err);
         this.isLoading = false;
         const errorMessage =
         err.error?.message === "An unexpected error occurred. Please try again later."

@@ -290,7 +290,8 @@ orginalUserName:string='';
           this.getTasks();
         },  error: (err) => {
          
-          this.logger.error('Task Added Faild', err); 
+          //this.logger.error('Task Added Faild', err); 
+          console.error('Task Added Faild', err);
           this.errorHandler.handleError(err);               
           alert(`Faild task added. Please try again.`);
         }});
@@ -305,7 +306,8 @@ orginalUserName:string='';
           this.getTasks();
         },error: (err) => {
          
-          this.logger.error('Task Updation Faild', err); 
+          //this.logger.error('Task Updation Faild', err);
+          console.error('Task Updation Faild', err); 
           this.errorHandler.handleError(err);               
           alert(`Faild task added. Please try again.`);
         }});
@@ -333,7 +335,8 @@ orginalUserName:string='';
         const message = 'Failed to load user tasks';
         console.error(message, err);
   
-        this.logger.error(message, err);     
+        //this.logger.error(message, err);   
+        console.error(message, err);  
         this.errorHandler.handleError(err);   
         alert("Could not fetch tasks. Please try again later.");
       }
@@ -358,14 +361,16 @@ orginalUserName:string='';
   this.taskService.deleteTask(id).subscribe({
     next: () => {
       alert("Task deleted successfully.");
-      this.logger.info(`Task with ID ${id} deleted successfully`);
+      //this.logger.info(`Task with ID ${id} deleted successfully`);
+      console.info(`Task with ID ${id} deleted successfully`);
       this.getTasks();
     },
     error: (err) => {
       const message = `Failed to delete task with ID ${id}`;
       console.error(message, err);
 
-      this.logger.error(message, err);
+      //this.logger.error(message, err);
+      console.error(message, err);
       this.errorHandler.handleError(err);
 
       alert("Failed to delete the task. Please try again later.");
@@ -450,7 +455,8 @@ orginalUserName:string='';
       this.userService.updateUser(this.formValue).subscribe({
         next: (res) => {
           alert('User Updated Successfully....');
-          this.logger.info('User updated successfully');
+          //this.logger.info('User updated successfully');
+          console.info('User updated successfully');
           this.getUserByid();
           this.userFormSettings.reset();
           this.closeGotoSettingModal();
@@ -458,7 +464,8 @@ orginalUserName:string='';
         },
         error: (err) => {
           console.error('Failed to update user', err);
-          this.logger.error('Failed to update user', err);
+          //this.logger.error('Failed to update user', err);
+          console.error('Failed to update user', err)
           this.errorHandler.handleError(err);
           alert('Failed to update user. Please try again later.');
         }
@@ -593,7 +600,8 @@ orginalUserName:string='';
       },
       error:(err)=>{
         console.error('Failed to update user', err);
-        this.logger.error('Failed to update user', err);
+        //this.logger.error('Failed to update user', err);
+        console.error('Failed to update user', err);
         this.errorHandler.handleError(err);
         alert('Failed to update user. Please try again later.');
       }
