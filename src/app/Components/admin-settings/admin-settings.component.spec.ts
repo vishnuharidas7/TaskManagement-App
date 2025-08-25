@@ -9,7 +9,7 @@ import { LoggerServiceService } from '../../Services/logger-service.service';
 import { ErrorHandler, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-fdescribe('AdminSettingsComponent', () => {
+describe('AdminSettingsComponent', () => {
   let component: AdminSettingsComponent;
   let fixture: ComponentFixture<AdminSettingsComponent>;
 

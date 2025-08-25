@@ -15,11 +15,13 @@ export const loggingInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError(error => {
       // error here is probably HttpErrorResponse
-      logger.error('HTTP Error', {
-        status: error.status,
-        message: error.message,
-        url: req.url
-      });
+      // logger.error('HTTP Error', {
+      //   status: error.status,
+      //   message: error.message,
+      //   url: req.url
+      // });
+      console.error(`HTTP Error - Status: ${error.status}, Message: ${error.message}, URL: ${req.url}`);
+
       return throwError(() => error);
     })
   );

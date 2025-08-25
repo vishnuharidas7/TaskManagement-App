@@ -275,7 +275,8 @@ goToPage(page: number): void {
         this.users = res;
       },
       error: (err) => {
-        this.logger.error("Failed to fetch users", err);         
+        //this.logger.error("Failed to fetch users", err);      
+        console.error("Failed to fetch users", err);   
         this.errorHandler.handleError(err);                     
         alert("Unable to load users. Please try again later."); 
       }
@@ -293,7 +294,8 @@ goToPage(page: number): void {
         this.applyFilters();
       },
       error: (err) => {
-        this.logger.error("Failed to fetch tasks", err);         
+        //this.logger.error("Failed to fetch tasks", err); 
+        console.error("Failed to fetch tasks", err);        
         this.errorHandler.handleError(err);                     
         alert("Unable to load tasks. Please try again later.");  
       }
@@ -310,7 +312,8 @@ goToPage(page: number): void {
           this.getTasks(); 
         },
         error: (err) => {
-          this.logger.error("Failed to delete task", err);        
+          //this.logger.error("Failed to delete task", err);   
+          console.error("Failed to delete task", err)     
           this.errorHandler.handleError(err);                     
           alert("Failed to delete the task. Please try again later."); 
         }
@@ -392,7 +395,8 @@ get fileuploadControl()
           this.closeModal();
           this.getTasks();
         }, error: (err) => {
-          this.logger.error("Failed to add task", err);
+          //this.logger.error("Failed to add task", err);
+          console.error("Failed to add task", err);
           this.errorHandler.handleError(err);
           alert("Failed to add task. Please try again.");
         }
@@ -409,7 +413,8 @@ get fileuploadControl()
           this.getTasks();
         },
         error: (err) => {
-          this.logger.error("Failed to update task", err);
+          //this.logger.error("Failed to update task", err);
+          console.error("Failed to update task", err);
           this.errorHandler.handleError(err);
           alert("Failed to update task. Please try again.");
         }
@@ -467,7 +472,8 @@ onFileUpload() {
       },
       error: (err) => {
         this.isUploading = false; // Stop spinner
-        this.logger.error('❌ File upload error', err);
+        //this.logger.error('❌ File upload error', err);
+        console.error('❌ File upload error', err);
         this.errorHandler.handleError(err);
         alert('❌ File upload failed. Please try again.');
         this.fileUploadError = 'File upload failed. Please try again.';
@@ -475,7 +481,8 @@ onFileUpload() {
     });
   } else {
     alert('⚠️ Please select a file before uploading.');
-    this.logger.warn('File upload attempted without selecting a file');
+    //this.logger.warn('File upload attempted without selecting a file');
+    console.warn('File upload attempted without selecting a file');
     this.fileUploadError = 'Please select a file before uploading.';
   }
 }
